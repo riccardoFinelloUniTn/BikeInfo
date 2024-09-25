@@ -2,8 +2,15 @@
 Project for Software Engineering course at University of Trento
 
 
-In un mondo di codici e bit, S’innalza Fanton, un gigante fit. Con la sua statura che sfiora il cielo, Naviga tra i server con un cuore di gelo.
+https://dati.trentino.it/en_GB/dataset/c-entro-in-bici-open-data
 
-Ama Linux, il suo fedele compagno, In ogni riga di codice trova un guadagno. Con terminale aperto e sguardo deciso, Risolve problemi con un sorriso.
+https://dati.trentino.it/en_GB/dataset/piste-ciclabili-open-data
 
-Alto come una torre, forte come un leone, Fanton è il re della programmazione. Tra kernel e script, trova la sua via, In un mondo digitale, è pura magia.
+https://dati.trentino.it/en_GB/dataset/parcheggio-protetto-per-biciclette-open-data
+
+https://dati.trentino.it/en_GB/dataset/stazioni-bike-sharing-emotion-trentino
+
+https://dati.trentino.it/en_GB/dataset/rastrelliere-per-biciclette-open-data
+
+
+https://leafletjs.com/

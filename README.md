@@ -19,3 +19,4 @@ https://leafletjs.com/
 Pagine già esistenti
 https://www.comune.trento.it/Aree-tematiche/Ambiente-e-territorio/Mobilita-e-traffico-urbano/Servizi/C-entro-in-bici
 https://www.trentinomobilita.it/biciclette-bs-trento
+https://www.bicincitta.com/frmLeStazioniComune.aspx?ID=187

@@ -14,3 +14,8 @@ https://dati.trentino.it/en_GB/dataset/rastrelliere-per-biciclette-open-data
 
 
 https://leafletjs.com/
+
+
+Pagine già esistenti
+https://www.comune.trento.it/Aree-tematiche/Ambiente-e-territorio/Mobilita-e-traffico-urbano/Servizi/C-entro-in-bici
+https://www.trentinomobilita.it/biciclette-bs-trento

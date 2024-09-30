@@ -12,6 +12,8 @@ https://dati.trentino.it/en_GB/dataset/stazioni-bike-sharing-emotion-trentino
 
 https://dati.trentino.it/en_GB/dataset/rastrelliere-per-biciclette-open-data
 
+https://dati.trentino.it/en_GB/dataset/itinerari-ciclabili-esistenti-open-data
+
 
 https://leafletjs.com/
 

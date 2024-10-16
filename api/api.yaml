@@ -1,0 +1,76 @@
+openapi: 3.0.0
+info:
+  title: BikeInfo API
+  description: API sviluppate per il progetto InfoBike durante il corso di Ingegneria del Software (A.A. 2024/2025)
+  version: 0.0.1
+
+servers:
+  - url: http://localhost:8080/api
+    description: Server di sviluppo
+
+paths:
+  /test:
+    get:
+      summary: Test API
+      description: Test API per verificare il funzionamento del server
+      responses:
+        "200":
+          description: Risposta di successo
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Hello, World!"
+
+  /users:
+    get:
+      summary: Lista utenti
+      description: Restituisce la lista degli utenti registrati
+      responses:
+        "200":
+          description: Risposta di successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/User"
+    post:
+      summary: Registrazione utente
+      description: Registra un nuovo utente
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "201":
+          description: Utente registrato con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Errore nei dati inviati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nei dati inviati"
+        "409":
+          description: Utente già registrato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utente già registrato"

@@ -1,0 +1,23 @@
+{
+  "name": "backend",
+  "version": "1.0.0",
+  "description": "Server side of the web app",
+  "main": "server.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/riccardoFinelloUniTn/BikeInfo.git"
+  },
+  "author": "Francesco Fanton, Riccardo Finello, Matteo Ballardin",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/riccardoFinelloUniTn/BikeInfo/issues"
+  },
+  "homepage": "https://github.com/riccardoFinelloUniTn/BikeInfo#readme",
+  "dependencies": {
+    "express": "^4.21.1",
+    "mongoose": "^8.7.3"
+  }
+}

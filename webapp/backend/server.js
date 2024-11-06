@@ -5,6 +5,8 @@ const port = 3000;
 const mongoose = require("mongoose");
 main().catch((err) => console.log(err));
 
+require("dotenv").config();
+
 async function main() {
   await mongoose.connect("mongodb://127.0.0.1:27017/test");
 

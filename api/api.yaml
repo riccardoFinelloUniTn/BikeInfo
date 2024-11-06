@@ -2,11 +2,120 @@ openapi: 3.0.0
 info:
   title: BikeInfo API
   description: API sviluppate per il progetto InfoBike durante il corso di Ingegneria del Software (A.A. 2024/2025)
-  version: 0.0.1
+  version: 0.0.5
+  modified: 06-11-2024
 
 servers:
-  - url: http://localhost:8080/api
-    description: Server di sviluppo
+  - url: http://localhost:3000/api
+    description: Server per la gestione delle richieste API
+
+##General Rules for MongoDB Schema Design:
+#Rule 1: Favor embedding unless there is a compelling reason not to.
+#Rule 2: Needing to access an object on its own is a compelling reason not to embed it.
+#Rule 3: Avoid joins and lookups if possible, but don't be afraid if they can provide a better schema design.
+#Rule 4: Arrays should not grow without bound. If there are more than a couple of hundred documents on the many side, don't embed them; if there are more than a few thousand documents on the many side, don't use an array of ObjectID references. High-cardinality arrays are a compelling reason not to embed.
+#Rule 5: As always, with MongoDB, how you model your data depends entirely on your particular application's data access patterns. You want to structure your data to match the ways that your application queries and updates it.
+
+components:
+  schemas:
+    User:
+      type: object
+      properties:
+        uid:
+          type: string
+          example: "12345"
+        self:
+        name:
+          type: string
+          example: "John"
+        surname:
+          type: string
+          example: "Cena"
+        email:
+          type: string
+          example: "john.cena@gmail.com"
+        password: # Hashed password
+          type: string
+          example: "5d41402abc4b2a76b9719d911017c592"
+        picture:
+          type: string
+          example: "https://example.com/picture.jpg"
+
+    Entity:
+      type: object
+      properties:
+        eid:
+          type: string
+          example: "12345"
+        name:
+          type: string
+          example: "Rastrelliera Albere"
+        description:
+          type: string
+          example: "Rastrelliera per biciclette"
+        geolocation:
+          type: string
+          example: "45.123456, 9.123456"
+        type:
+          type: string
+          example: "Rastrelliera"
+        rating:
+          type: number
+          example: 4.5
+        reviews:
+          type: array
+          items:
+            $ref: "#/components/schemas/Review"
+        feedbacks:
+          type: array
+          items:
+            $ref: "#/components/schemas/Feedback"
+
+    Review:
+      type: object
+      properties:
+        rid:
+          type: string
+          example: "12345"
+        entityId:
+          type: string
+          example: "12345"
+        rating:
+          type: number #from 1 to 5 stars
+          example: 4
+        uEmail:
+          type: string
+          example: "john.cena@gmail.com"
+        comment:
+          type: string
+          example: "Ottimo servizio!"
+        date:
+          type: string
+          format: date-time
+          example: "31-12-2024"
+
+    Feedback:
+      type: object
+      properties:
+        fid:
+          type: string
+          example: "12345"
+        entityId:
+          type: string
+          example: "12345"
+        uEmail:
+          type: string
+          example: "john.cena@gmail.com"
+        comment:
+          type: string
+          example: "C'è una buca in via Roma!"
+        geolocation:
+          type: string
+          example: "45.123456, 9.123456"
+        date:
+          type: string
+          format: date-time
+          example: "31-12-2024"
 
 paths:
   /test:
@@ -38,6 +147,7 @@ paths:
                 type: array
                 items:
                   $ref: "#/components/schemas/User"
+
     post:
       summary: Registrazione utente
       description: Registra un nuovo utente
@@ -74,3 +184,247 @@ paths:
                   message:
                     type: string
                     example: "Utente già registrato"
+
+  /users/{uid}:
+    get:
+      summary: Dettagli utente
+      description: Restituisce i dettagli di un utente
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          description: ID dell'utente
+          schema:
+            type: string
+            example: "12345"
+      responses:
+        "200":
+          description: Risposta di successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "404":
+          description: Utente non trovato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utente non trovato"
+
+    put:
+      summary: Modifica utente
+      description: Modifica i dati di un utente
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          description: ID dell'utente
+          schema:
+            type: string
+            example: "12345"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/User"
+      responses:
+        "200":
+          description: Utente modificato con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/User"
+        "400":
+          description: Errore nei dati inviati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nei dati inviati"
+        "404":
+          description: Utente non trovato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utente non trovato"
+
+    delete:
+      summary: Elimina utente
+      description: Elimina un utente
+      parameters:
+        - in: path
+          name: uid
+          required: true
+          description: ID dell'utente
+          schema:
+            type: string
+            example: "12345"
+      responses:
+        "204":
+          description: Utente eliminato con successo
+        "404":
+          description: Utente non trovato
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Utente non trovato"
+
+  /entities:
+    get:
+      summary: Lista entità
+      description: Restituisce la lista delle entità registrate
+      responses:
+        "200":
+          description: Risposta di successo
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Entity"
+
+    post:
+      summary: Registrazione entità
+      description: Registra una nuova entità
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Entity"
+      responses:
+        "201":
+          description: Entità registrata con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity"
+        "400":
+          description: Errore nei dati inviati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nei dati inviati"
+        "409":
+          description: Entità già registrata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Entità già registrata"
+
+  /entities/{eid}:
+    get:
+      summary: Dettagli entità
+      description: Restituisce i dettagli di un'entità
+      parameters:
+        - in: path
+          name: eid
+          required: true
+          description: ID dell'entità
+          schema:
+            type: string
+            example: "12345"
+      responses:
+        "200":
+          description: Risposta di successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity"
+        "404":
+          description: Entità non trovata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Entità non trovata"
+
+    put:
+      summary: Modifica entità
+      description: Modifica i dati di un'entità
+      parameters:
+        - in: path
+          name: eid
+          required: true
+          description: ID dell'entità
+          schema:
+            type: string
+            example: "12345"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/Entity"
+      responses:
+        "200":
+          description: Entità modificata con successo
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Entity"
+        "400":
+          description: Errore nei dati inviati
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Errore nei dati inviati"
+        "404":
+          description: Entità non trovata
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Entità non trovata"
+
+    delete:
+      summary: Elimina entità
+      description: Elimina un'entità
+      parameters:
+        - in: path
+          name: eid
+          required: true
+          description: ID dell'entità
+          schema:
+            type: string
+            example: "12345"
+      responses:
+        "204":
+          description: Entità eliminata con successo
+        "404":
+          description: Entità non trovata
+          content: application

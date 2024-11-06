@@ -2,8 +2,7 @@ openapi: 3.0.0
 info:
   title: BikeInfo API
   description: API sviluppate per il progetto InfoBike durante il corso di Ingegneria del Software (A.A. 2024/2025)
-  version: 0.0.5
-  modified: 06-11-2024
+  version: 0.0.7
 
 servers:
   - url: http://localhost:3000/api
@@ -24,7 +23,6 @@ components:
         uid:
           type: string
           example: "12345"
-        self:
         name:
           type: string
           example: "John"
@@ -427,4 +425,11 @@ paths:
           description: Entità eliminata con successo
         "404":
           description: Entità non trovata
-          content: application
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: "Entità non trovata"

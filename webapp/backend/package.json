@@ -4,7 +4,9 @@
   "description": "Server side of the web app",
   "main": "server.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "npx tsc",
+    "start": "node webapp/backend/dist/server.js",
+    "dev": "nodemon webapp/backend/server.ts"
   },
   "repository": {
     "type": "git",
@@ -17,7 +19,16 @@
   },
   "homepage": "https://github.com/riccardoFinelloUniTn/BikeInfo#readme",
   "dependencies": {
+    "backend": "file:",
     "express": "^4.21.1",
     "mongoose": "^8.7.3"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.9.0",
+    "concurrently": "^9.1.0",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3"
   }
 }

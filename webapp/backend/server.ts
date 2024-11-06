@@ -23,7 +23,7 @@ const kittySchema = new mongoose.Schema({
 
 const Kitten = mongoose.model("Kitten", kittySchema);
 
-const silence = new Kitten({ name: "Silence" });
+const silence = new Kitten({ name: "Silence 5" });
 console.log(silence.name); // 'Silence'
 
 app.get("/", ( req: Request, res: Response) => {
@@ -34,3 +34,5 @@ app.get("/", ( req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
 });
+
+

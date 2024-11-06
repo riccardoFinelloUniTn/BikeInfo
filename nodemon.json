@@ -1,0 +1,5 @@
+{
+  "watch": ["webapp/backend/"],
+  "ext": "ts",
+  "exec": "concurrently \"npx tsc --watch\" \"ts-node webapp/backend/server.ts\""
+}

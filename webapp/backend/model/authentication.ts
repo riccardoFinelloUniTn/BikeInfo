@@ -21,7 +21,7 @@ app.post(
     }
 
     // check if password matches
-    if (user.password != req.body.password)
+    if (user.password != req.body.password) //TODO salt e hash
       res.json({
         success: false,
         message: "Authentication failed. Wrong password.",
@@ -54,7 +54,7 @@ const tokenChecker = function (
 
   // if there is no token
   if (!token) {
-    return res.status(401).send({
+    return res.status(401).json({
       success: false,
       message: "No token provided.",
     });
@@ -66,7 +66,7 @@ const tokenChecker = function (
     process.env.SUPER_SECRET,
     function (err: Error, decoded: string) {
       if (err) {
-        return res.status(403).send({
+        return res.status(403).json({
           success: false,
           message: "Failed to authenticate token.",
         });

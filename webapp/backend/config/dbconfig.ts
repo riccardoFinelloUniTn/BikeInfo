@@ -1,7 +1,7 @@
 // config/dbconfig.ts
 import mongoose from 'mongoose';
 
-const mongoURI = 'mongodb://localhost:27017/yourDatabaseName';
+const mongoURI = 'mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/'; 
 
 mongoose.connect(mongoURI)
   .then(() => console.log('Mongoose is connected'))

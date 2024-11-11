@@ -1,17 +1,15 @@
 import dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 import userModel from "./model/user.model";
-
 dotenv.config();
 
-const app :Express = express();
+const app: Express = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
 
-
-const jwt  = require("jsonwebtoken");
-require('dotenv').config();
+const jwt = require("jsonwebtoken");
+require("dotenv").config();
 
 const mongoose = require("mongoose");
 main().catch((err) => console.log(err));
@@ -33,8 +31,7 @@ const Kitten = mongoose.model("Kitten", kittySchema);
 const silence = new Kitten({ name: "Silence 5" });
 console.log(silence.name); // 'Silence'
 
-app.get("/", ( req: Request, res: Response) => {
-
+app.get("/", (req: Request, res: Response) => {
   res.send("Hello World!");
 });
 
@@ -42,40 +39,91 @@ app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
 });
 
-app.get('/auth', async function(req :Request , res : Response) {//TODO password criptate con hash e salt con pbkdf2
-	
-	console.log(req.body);
-	if(req.body == null){
-		res.status(400).json({ success: false, message: 'Authentication failed. Body not found.' });
-		return;
-	}
-	if(req.body.email == null || req.body.password == null){
-		res.status(400).json({ success: false, message: 'Authentication failed. Password or email not found.' });
-		res.sendStatus(400);
-		return;
-	}
-	console.log("after check");
-	// find the user
-	let user = await userModel.findOne({ email: req.body.email }).exec();
-	
-	// user not found
-	if (!user){
-        res.json({ success: false, message: 'Authentication failed. User not found.' });
-        return;
-    }
-	
-	// check if password matches
-	if (user.password != req.body.password){
-		res.json({ success: false, message: 'Authentication failed. Wrong password.' });
-		return;
-	}
-	
-	// if user is found and password is right create a token
-	var token = jwt.sign({ email: user.email }, process.env.SUPER_SECRET, { expiresIn: 86400 });
+app.get("/auth", async function (req: Request, res: Response) {
+  //TODO password criptate con hash e salt con pbkdf2
 
-	res.status(200).json({
-		success: true,
-		message: 'Enjoy your token!',
-		token: token
-	});
+  console.log(req.body);
+  if (req.body == null) {
+    res.status(400).json({
+      success: false,
+      message: "Authentication failed. Body not found.",
+    });
+    return;
+  }
+  if (req.body.email == null || req.body.password == null) {
+    res.status(400).json({
+      success: false,
+      message: "Authentication failed. Password or email not found.",
+    });
+    res.sendStatus(400);
+    return;
+  }
+  console.log("after check");
+  // find the user
+  let user = await userModel.findOne({ email: req.body.email }).exec();
+
+  // user not found
+  if (!user) {
+    res.json({
+      success: false,
+      message: "Authentication failed. User not found.",
+    });
+    return;
+  }
+
+  // check if password matches
+  if (user.password != req.body.password) {
+    res.json({
+      success: false,
+      message: "Authentication failed. Wrong password.",
+    });
+    return;
+  }
+
+  // if user is found and password is right create a token
+  var token = jwt.sign({ email: user.email }, process.env.SUPER_SECRET, {
+    expiresIn: 86400,
+  });
+
+  res.status(200).json({
+    success: true,
+    message: "Enjoy your token!",
+    token: token,
+  });
 });
+
+const https = require("https"); // or 'https' for https:// URLs
+const fs = require("fs");
+const geojson = require("geojson");
+const decompress = require("decompress");
+
+
+
+const file = fs.createWriteStream("webapp/backend/opendata/centroincitta.zip");
+let centro_in_bici;
+const request = https.get(
+  "https://gis.comune.trento.it/dbexport?db=base&sc=mobilita&ly=centro_in_bici&fr=geojson",
+  function (response: Response) {
+    response.pipe(file);
+
+    // after download completed close filestream
+    file.on("finish", () => {
+      file.close();
+      console.log("Download Completed");
+      console.log("Starting decompression");
+      decompress(
+        "webapp/backend/opendata/centroincitta.zip",
+        "webapp/backend/dist/opendata"
+      )
+        .then((files: any[]) =>  {
+			console.log("Decompression completed");
+			let data : string =  files[0].data.toString(); ;
+			centro_in_bici = JSON.parse(data);
+			console.log(centro_in_bici);
+        })
+        .catch((error: Error) => {
+          console.log(error);
+        });
+    });
+  }
+);

@@ -21,8 +21,10 @@
   "dependencies": {
     "@types/pbkdf2": "^3.1.2",
     "backend": "file:",
+    "decompress": "^4.2.1",
     "dotenv": "^16.4.5",
     "express": "^4.21.1",
+    "geojson": "^0.5.0",
     "google-auth-library": "^9.14.2",
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3"

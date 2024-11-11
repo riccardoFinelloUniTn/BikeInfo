@@ -1,6 +1,7 @@
 import dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 import userModel from "./model/user.model";
+import getCentroInBici from "./opendata/centroInBici";
 dotenv.config();
 
 const app: Express = express();
@@ -18,7 +19,7 @@ require("dotenv").config();
 
 async function main() {
   await mongoose.connect("mongodb://127.0.0.1:27017/test");
-
+  console.log(await getCentroInBici);
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 
@@ -92,38 +93,8 @@ app.get("/auth", async function (req: Request, res: Response) {
   });
 });
 
-const https = require("https"); // or 'https' for https:// URLs
-const fs = require("fs");
-const geojson = require("geojson");
-const decompress = require("decompress");
 
 
 
-const file = fs.createWriteStream("webapp/backend/opendata/centroincitta.zip");
-let centro_in_bici;
-const request = https.get(
-  "https://gis.comune.trento.it/dbexport?db=base&sc=mobilita&ly=centro_in_bici&fr=geojson",
-  function (response: Response) {
-    response.pipe(file);
 
-    // after download completed close filestream
-    file.on("finish", () => {
-      file.close();
-      console.log("Download Completed");
-      console.log("Starting decompression");
-      decompress(
-        "webapp/backend/opendata/centroincitta.zip",
-        "webapp/backend/dist/opendata"
-      )
-        .then((files: any[]) =>  {
-			console.log("Decompression completed");
-			let data : string =  files[0].data.toString(); ;
-			centro_in_bici = JSON.parse(data);
-			console.log(centro_in_bici);
-        })
-        .catch((error: Error) => {
-          console.log(error);
-        });
-    });
-  }
-);
+

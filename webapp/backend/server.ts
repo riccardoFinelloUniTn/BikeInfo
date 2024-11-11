@@ -1,7 +1,6 @@
 import dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 import userModel from "./model/user.model";
-import getBikeSharing from "./opendata/bikeSharing";
 import getCentroInBici from "./opendata/centroInBici";
 import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
@@ -33,7 +32,7 @@ async function main() {
   await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/");
   centro_in_bici = await getCentroInBici;
   parcheggio_protetto = await getParcheggioProtetto;
-  bike_sharing = await getBikeSharing;
+  //bike_sharing = await getBikeSharing; TODO il server non risponde
   rastrelliere = await getRastrelliere;
   itinerari = await getItinerari;
   // piste_ciclabili = await getPisteCiclabili; TODO controllare perche non vi è nessun file

@@ -17,9 +17,13 @@ main().catch((err) => console.log(err));
 
 require("dotenv").config();
 
+let centro_in_bici :any;
+
 async function main() {
-  await mongoose.connect("mongodb://127.0.0.1:27017/test");
-  let centro_in_bici = await getCentroInBici;
+  await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/");
+  centro_in_bici = await getCentroInBici;
+  console.log(centro_in_bici);
+  
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 

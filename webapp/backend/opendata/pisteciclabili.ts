@@ -1,7 +1,7 @@
 import { Response } from "express";
-import shp from "shpjs";
 
-const https = require("https"); // or 'https' for https:// URLs
+const shapefile = require("shapefile");
+const https = require("https"); 
 const fs = require("fs");
 const geojson = require("geojson");
 const decompress = require("decompress");
@@ -11,7 +11,7 @@ const file = fs.createWriteStream("webapp/backend/opendata/bikesharing.zip");
 async function getPisteCiclabili() {
   return new Promise((resolve: Function, reject: Function) => {
     https.get(
-      "http://webapps.comune.trento.it/cartografia/gis/dbexport?db=base&sc=mobilita&ly=piste_ciclabili&fr=shp",
+      "https://webapps.comune.trento.it/cartografia/gis/dbexport?db=base&sc=mobilita&ly=piste_ciclabili&fr=shp",
       function (response: Response) {
         response.pipe(file);
         file.on("finish", () => {
@@ -25,7 +25,7 @@ async function getPisteCiclabili() {
             .then(async (files: any[]) => {
               console.log("Decompression completed");
               let data: string = files[0].data.toString();
-              let centro_in_bici = await shp(data);
+              let centro_in_bici = await shapefile(data);
               resolve(centro_in_bici);
             })
             .catch((error: Error) => {

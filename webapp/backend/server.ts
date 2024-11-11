@@ -5,7 +5,6 @@ import getBikeSharing from "./opendata/bikeSharing";
 import getCentroInBici from "./opendata/centroInBici";
 import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
-import getPisteCiclabili from "./opendata/pisteciclabili";
 import getRastrelliere from "./opendata/rastrelliere";
 dotenv.config();
 
@@ -37,7 +36,7 @@ async function main() {
   bike_sharing = await getBikeSharing;
   rastrelliere = await getRastrelliere;
   itinerari = await getItinerari;
-  piste_ciclabili = await getPisteCiclabili;
+  // piste_ciclabili = await getPisteCiclabili; TODO controllare perche non vi è nessun file
   console.log(centro_in_bici);
   console.log(parcheggio_protetto);
   console.log(bike_sharing);

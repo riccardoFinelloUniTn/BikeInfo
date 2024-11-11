@@ -1,7 +1,12 @@
 import dotenv from "dotenv";
 import express, { Express, Request, Response } from "express";
 import userModel from "./model/user.model";
+import getBikeSharing from "./opendata/bikeSharing";
 import getCentroInBici from "./opendata/centroInBici";
+import getItinerari from "./opendata/itinerari";
+import getParcheggioProtetto from "./opendata/parcheggioprotetto";
+import getPisteCiclabili from "./opendata/pisteciclabili";
+import getRastrelliere from "./opendata/rastrelliere";
 dotenv.config();
 
 const app: Express = express();
@@ -18,12 +23,28 @@ main().catch((err) => console.log(err));
 require("dotenv").config();
 
 let centro_in_bici :any;
+let parcheggio_protetto :any;
+let bike_sharing :any;
+let rastrelliere :any;
+let itinerari :any;
+let piste_ciclabili :any;
+let ready: boolean = false;
 
 async function main() {
   await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/");
   centro_in_bici = await getCentroInBici;
+  parcheggio_protetto = await getParcheggioProtetto;
+  bike_sharing = await getBikeSharing;
+  rastrelliere = await getRastrelliere;
+  itinerari = await getItinerari;
+  piste_ciclabili = await getPisteCiclabili;
   console.log(centro_in_bici);
-  
+  console.log(parcheggio_protetto);
+  console.log(bike_sharing);
+  console.log(rastrelliere);
+  console.log(itinerari);
+  console.log(piste_ciclabili);
+  ready = true;
   // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 

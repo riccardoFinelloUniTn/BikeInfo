@@ -4,7 +4,7 @@ const geojson = require("geojson");
 const decompress = require("decompress");
 import { Response } from "express";
 
-const file = fs.createWriteStream("webapp/backend/opendata/itinerari.zip");
+const file = fs.createWriteStream("webapp/backend/dist/opendata/itinerari.zip");
 
 
 async function getItinerari() {
@@ -18,7 +18,7 @@ async function getItinerari() {
           console.log("Download Completed");
           console.log("Starting decompression");
           decompress(
-            "webapp/backend/opendata/itinerari.zip",
+            "webapp/backend/dist/opendata/itinerari.zip",
             "webapp/backend/dist/opendata"
           )
             .then((files: any[]) => {

@@ -5,7 +5,7 @@ const geojson = require("geojson");
 const decompress = require("decompress");
 import { Response } from "express";
 
-const file = fs.createWriteStream("webapp/backend/opendata/rastrelliere.zip");
+const file = fs.createWriteStream("webapp/backend/dist/opendata/rastrelliere.zip");
 
 
 async function getRastrelliere() {
@@ -19,7 +19,7 @@ async function getRastrelliere() {
           console.log("Download Completed");
           console.log("Starting decompression");
           decompress(
-            "webapp/backend/opendata/rastrelliere.zip",
+            "webapp/backend/dist/opendata/rastrelliere.zip",
             "webapp/backend/dist/opendata"
           )
             .then((files: any[]) => {

@@ -6,7 +6,7 @@ const fs = require("fs");
 const geojson = require("geojson");
 const decompress = require("decompress");
 
-const file = fs.createWriteStream("webapp/backend/opendata/bikesharing.zip");
+const file = fs.createWriteStream("webapp/backend/dist/opendata/bikesharing.zip");
 
 async function getPisteCiclabili() {
   return new Promise((resolve: Function, reject: Function) => {
@@ -19,7 +19,7 @@ async function getPisteCiclabili() {
           console.log("Download Completed");
           console.log("Starting decompression");
           decompress(
-            "webapp/backend/opendata/bikesharing.zip",
+            "webapp/backend/dist/opendata/bikesharing.zip",
             "webapp/backend/dist/opendata"
           )
             .then(async (files: any[]) => {

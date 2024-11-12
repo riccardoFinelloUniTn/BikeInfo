@@ -1,10 +1,11 @@
 import dotenv from "dotenv";
-import express, { Express, Request, Response } from "express";
+import express, { Express, Request, Response, NextFunction } from "express";
 import userModel from "./model/user.model";
 import getCentroInBici from "./opendata/centroInBici";
 import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getRastrelliere from "./opendata/rastrelliere";
+import reviewModel from "./model/review.model";
 dotenv.config();
 
 const app: Express = express();
@@ -20,12 +21,12 @@ main().catch((err) => console.log(err));
 
 require("dotenv").config();
 
-let centro_in_bici :any;
-let parcheggio_protetto :any;
-let bike_sharing :any;
-let rastrelliere :any;
-let itinerari :any;
-let piste_ciclabili :any;
+let centro_in_bici: any;
+let parcheggio_protetto: any;
+let bike_sharing: any;
+let rastrelliere: any;
+let itinerari: any;
+let piste_ciclabili: any;
 let ready: boolean = false;
 
 async function main() {
@@ -62,6 +63,95 @@ app.get("/", (req: Request, res: Response) => {
 app.listen(port, () => {
   console.log(`Example app listening on port http://localhost:${port}`);
 });
+
+
+app.get(
+  "/reviews/:eid",
+  (async (req: Request, res: Response, next: NextFunction) => {
+    try {
+      const { eid } = req.params;
+
+      // Check if the entity ID is provided
+      if (!eid) {
+        return res.status(400).json({
+          success: false,
+          message: "Entity ID is required.",
+        });
+      }
+
+      // Fetch all reviews related to the given entity ID
+      const reviews = await reviewModel.find({ entityId: eid }).exec();
+
+      // If no reviews found, respond accordingly
+      if (reviews.length === 0) {
+        return res.status(404).json({
+          success: false,
+          message: "No reviews found for the given entity.",
+        });
+      }
+
+      // Respond with the found reviews
+      return res.status(200).json({
+        success: true,
+        reviews: reviews,
+      });
+    } catch (error) {
+      console.error("Error fetching reviews:", error);
+      next(error); // Passing the error to Express’s error handler
+    }
+  }) as express.RequestHandler
+);
+
+app.get("/rastrelliere", async function (req: Request, res: Response) {
+  if (ready) {
+    res.json(JSON.stringify(rastrelliere));
+  }
+  else {
+    res.sendStatus(500);
+  }
+})
+
+
+app.get("/parcheggioprotetto", async function (req: Request, res: Response) {
+  if (ready) {
+    res.json(JSON.stringify(parcheggio_protetto));
+  }
+  else {
+    res.sendStatus(500);
+  }
+})
+
+
+app.get("/itinerari", async function (req: Request, res: Response) {
+  if (ready) {
+    res.json(JSON.stringify(itinerari));
+  }
+  else {
+    res.sendStatus(500);
+  }
+})
+
+
+app.get("/centroinbici", async function (req: Request, res: Response) {
+  if (ready) {
+    res.json(JSON.stringify(centro_in_bici));
+  }
+  else {
+    res.sendStatus(500);
+  }
+})
+
+
+app.get("/bikesharing", async function (req: Request, res: Response) {
+  if (ready) {
+    res.json(JSON.stringify(bike_sharing));
+  }
+  else {
+    res.sendStatus(500);
+  }
+})
+
+
 
 app.get("/auth", async function (req: Request, res: Response) {
   //TODO password criptate con hash e salt con pbkdf2
@@ -115,9 +205,5 @@ app.get("/auth", async function (req: Request, res: Response) {
     token: token,
   });
 });
-
-
-
-
 
 

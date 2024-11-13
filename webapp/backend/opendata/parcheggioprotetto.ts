@@ -6,7 +6,7 @@ const geojson = require("geojson");
 const decompress = require("decompress");
 import { Response } from "express";
 
-const file = fs.createWriteStream("webapp/backend/dist/opendata/parcheggioprotetto.zip");
+const file = fs.createWriteStream("dist/opendata/parcheggioprotetto.zip");
 
 
 async function getParcheggioProtetto() {
@@ -20,8 +20,8 @@ async function getParcheggioProtetto() {
           console.log("Download Completed");
           console.log("Starting decompression");
           decompress(
-            "webapp/backend/dist/opendata/parcheggioprotetto.zip",
-            "webapp/backend/dist/opendata"
+            "dist/opendata/parcheggioprotetto.zip",
+            "dist/opendata"
           )
             .then((files: any[]) => {
               console.log("Decompression completed");

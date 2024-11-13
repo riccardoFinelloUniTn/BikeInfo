@@ -4,7 +4,7 @@ const geojson = require("geojson");
 const decompress = require("decompress");
 import { Response } from "express";
 
-const file = fs.createWriteStream("webapp/backend/dist/opendata/centroincitta.zip");
+const file = fs.createWriteStream("dist/opendata/centroinbici.zip");
 
 
 async function getCentroInBici() {
@@ -18,8 +18,8 @@ async function getCentroInBici() {
           console.log("Download Completed");
           console.log("Starting decompression");
           decompress(
-            "webapp/backend/dist/opendata/centroincitta.zip",
-            "webapp/backend/dist/opendata"
+            "dist/opendata/centroinbici.zip",
+            "dist/opendata"
           )
             .then((files: any[]) => {
               console.log("Decompression completed");

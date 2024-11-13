@@ -1,12 +1,12 @@
 import dotenv from "dotenv";
-import express, { Express, Request, Response, NextFunction } from "express";
+import express, { Express, NextFunction, Request, Response } from "express";
+import { registerUser } from "./auth/register";
+import reviewModel from "./model/review.model";
 import userModel from "./model/user.model";
 import getCentroInBici from "./opendata/centroInBici";
 import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getRastrelliere from "./opendata/rastrelliere";
-import reviewModel from "./model/review.model";
-import { registerUser } from "./auth/register"; 
 
 
 dotenv.config();

@@ -1,85 +1,56 @@
-<script setup lang="ts">
-import { RouterLink, RouterView } from 'vue-router'
-import HelloWorld from './components/HelloWorld.vue'
-</script>
-
 <template>
-  <header>
-    <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
+    <navbar
+        :pages="pages"
+        :activePage="activePage"
+        :nav-link-click="(index: number) => activePage = index"
+    ></navbar>
 
-    <div class="wrapper">
-      <HelloWorld msg="You did it!" />
+    <page-viewer 
+        :page="pages[activePage]"
+    ></page-viewer>
 
-      <nav>
-        <RouterLink to="/">Home</RouterLink>
-        <RouterLink to="/about">About</RouterLink>
-      </nav>
-    </div>
-  </header>
+    <leaflet-map>    </leaflet-map>
+    
 
-  <RouterView />
 </template>
 
-<style scoped>
-header {
-  line-height: 1.5;
-  max-height: 100vh;
-}
+<script lang="ts">
+    import LeafletMap from './components/LeafletMap.vue';
+    import Navbar from './components/Navbar.vue';
+    import PageViewer from './components/PageViewer.vue';
 
-.logo {
-  display: block;
-  margin: 0 auto 2rem;
-}
-
-nav {
-  width: 100%;
-  font-size: 12px;
-  text-align: center;
-  margin-top: 2rem;
-}
-
-nav a.router-link-exact-active {
-  color: var(--color-text);
-}
-
-nav a.router-link-exact-active:hover {
-  background-color: transparent;
-}
-
-nav a {
-  display: inline-block;
-  padding: 0 1rem;
-  border-left: 1px solid var(--color-border);
-}
-
-nav a:first-of-type {
-  border: 0;
-}
-
-@media (min-width: 1024px) {
-  header {
-    display: flex;
-    place-items: center;
-    padding-right: calc(var(--section-gap) / 2);
-  }
-
-  .logo {
-    margin: 0 2rem 0 0;
-  }
-
-  header .wrapper {
-    display: flex;
-    place-items: flex-start;
-    flex-wrap: wrap;
-  }
-
-  nav {
-    text-align: left;
-    margin-left: -1rem;
-    font-size: 1rem;
-
-    padding: 1rem 0;
-    margin-top: 1rem;
-  }
-}
-</style>
+    export default {
+        components: {
+            Navbar,
+            PageViewer,
+            LeafletMap
+        },
+        data() {
+            return {
+                activePage: 0,
+                pages: [
+                    {
+                        link: {text: 'Home', url: 'index.html'},
+                        pageTitle: 'Home Page',
+                        content: 'This is the home page.'
+                    },
+                    {
+                        link: {text: 'About', url: 'about.html'},
+                        pageTitle: 'About Page',
+                        content: 'This is the about page.'
+                    },
+                    {
+                        link: {text: 'Contact', url: 'contact.html'},
+                        pageTitle: 'Contact Page',
+                        content: 'This is the contact page.'
+                    },
+                    // {
+                    //     link: {text: 'Services', url: 'services.html'},
+                    //     pageTitle: 'Services Page',
+                    //     content: 'This is the'
+                    // }
+                ]
+            };
+        },
+    };
+</script>

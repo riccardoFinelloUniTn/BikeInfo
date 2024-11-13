@@ -35,7 +35,7 @@ let piste_ciclabili: any;
 let ready: boolean = false;
 
 async function main() {
-  await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/");
+  await mongoose.connect("mongodb+srv://username:password@infobikecluster.dilv1.mongodb.net/InfoBikeDB");
   centro_in_bici = await getCentroInBici;
   parcheggio_protetto = await getParcheggioProtetto;
   //bike_sharing = await getBikeSharing; TODO il server non risponde
@@ -49,7 +49,6 @@ async function main() {
   console.log(itinerari);
   console.log(piste_ciclabili);
   ready = true;
-  // use `await mongoose.connect('mongodb://user:password@127.0.0.1:27017/test');` if your database has auth enabled
 }
 
 const kittySchema = new mongoose.Schema({

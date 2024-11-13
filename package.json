@@ -29,7 +29,8 @@
     "jsonwebtoken": "^9.0.2",
     "mongoose": "^8.7.3",
     "shapefile": "^0.6.6",
-    "shpjs": "^6.1.0"
+    "shpjs": "^6.1.0",
+    "uuid": "^11.0.3"
   },
   "devDependencies": {
     "@types/express": "^5.0.0",

@@ -1,6 +1,5 @@
-import mongoose, { Document, Schema } from 'mongoose';
+import mongoose, { Schema, Document } from 'mongoose';
 
-// Define the User interface for TypeScript
 interface IUser extends Document {
   uid: string;
   name: string;
@@ -8,18 +7,16 @@ interface IUser extends Document {
   email: string;
   password: string;
   salt: string;
-  picture?: string;
 }
 
-const userSchema: Schema = new mongoose.Schema({
-  uid: { type: String, required: true, unique: true },
+const userSchema = new Schema<IUser>({
+  uid: { type: String, required: true },
   name: { type: String, required: true },
   surname: { type: String, required: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
-  salt: {type: String, required: true},
-  picture: { type: String }
+  salt: { type: String, required: true }
 });
 
-// Export the model with IUser type
-export default mongoose.model<IUser>('User', userSchema);
+const User = mongoose.model<IUser>('User', userSchema);
+export default User;

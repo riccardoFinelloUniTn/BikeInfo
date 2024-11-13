@@ -1,21 +1,23 @@
-import { Request, Response, NextFunction, RequestHandler } from "express";
-import userModel from "../model/user.model"; // Import the User model
-import { savePassword } from "./hash"; // Import the password hashing function
+import { Request, Response, RequestHandler } from 'express';
+import userModel from '../model/user.model';
+import { savePassword } from '../auth/hash';
+import { v4 as uuidv4 } from 'uuid';
 
-export const registerUser: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
+
+export const registerUser: RequestHandler = async (req: Request, res: Response) => {
   try {
-    const { email, password } = req.body;
+    const { name, surname, email, password } = req.body;
 
-    // Check if email and password are provided
-    if (!email || !password) {
+    // Validate required fields
+    if (!email || !password || !name || !surname) {
       res.status(400).json({
         success: false,
-        message: "Email and password are required.",
+        message: "Name, surname, email, and password are required.",
       });
       return;
     }
 
-    // Check if the user already exists
+    // Check if user already exists
     const existingUser = await userModel.findOne({ email }).exec();
     if (existingUser) {
       res.status(409).json({
@@ -25,20 +27,31 @@ export const registerUser: RequestHandler = async (req: Request, res: Response, 
       return;
     }
 
-    // Hash password
+    // Generate user data
+    const uid = uuidv4();
     const { salt, hash } = savePassword(password);
 
     // Create and save new user
-    const newUser = new userModel({ email, salt, hash });
+    const newUser = new userModel({
+      uid,
+      name,
+      surname,
+      email,
+      password: hash,
+      salt,
+    });
+
     await newUser.save();
 
-    // Respond with success
     res.status(201).json({
       success: true,
       message: "User registered successfully!",
     });
   } catch (error) {
     console.error("Error registering user:", error);
-    next(error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while registering the user.",
+    });
   }
 };

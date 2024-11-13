@@ -6,7 +6,12 @@ import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getRastrelliere from "./opendata/rastrelliere";
 import reviewModel from "./model/review.model";
+import { registerUser } from "./auth/register"; 
+
+
 dotenv.config();
+
+
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -57,7 +62,7 @@ const silence = new Kitten({ name: "Silence 5" });
 console.log(silence.name); // 'Silence'
 
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World!");
+  res.send("Hello World! Correct File");
 });
 
 app.listen(port, () => {
@@ -206,4 +211,4 @@ app.get("/auth", async function (req: Request, res: Response) {
   });
 });
 
-
+app.post("/register", registerUser);

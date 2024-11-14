@@ -8,6 +8,7 @@ import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getRastrelliere from "./opendata/rastrelliere";
 import { authenticateUser } from "./auth/authController";
+import { getReviewsByEntityId } from "./dataControllers/getReviews";
 
 
 dotenv.config();
@@ -70,42 +71,7 @@ app.listen(port, () => {
 });
 
 
-app.get(
-  "/reviews/:eid",
-  (async (req: Request, res: Response, next: NextFunction) => {
-    try {
-      const { eid } = req.params;
-
-      // Check if the entity ID is provided
-      if (!eid) {
-        return res.status(400).json({
-          success: false,
-          message: "Entity ID is required.",
-        });
-      }
-
-      // Fetch all reviews related to the given entity ID
-      const reviews = await reviewModel.find({ entityId: eid }).exec();
-
-      // If no reviews found, respond accordingly
-      if (reviews.length === 0) {
-        return res.status(404).json({
-          success: false,
-          message: "No reviews found for the given entity.",
-        });
-      }
-
-      // Respond with the found reviews
-      return res.status(200).json({
-        success: true,
-        reviews: reviews,
-      });
-    } catch (error) {
-      console.error("Error fetching reviews:", error);
-      next(error); // Passing the error to Express’s error handler
-    }
-  }) as express.RequestHandler
-);
+app.get("/reviews/:eid", getReviewsByEntityId);
 
 app.get("/rastrelliere", async function (req: Request, res: Response) {
   if (ready) {

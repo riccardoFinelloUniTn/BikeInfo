@@ -1,7 +1,7 @@
 <template>
     <div>
-        <h3>An interactive leaflet map</h3>
-        <div id="map" style="height:500px; width: 500px; margin-left: 25%;" class="centered relative"></div>
+        <h3  class="pt-5">An interactive leaflet map</h3>
+        <div id="map" style="height:500px; width: 500px; margin-left: 25%;"></div>
     </div>
 </template>
 

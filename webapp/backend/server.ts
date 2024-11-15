@@ -18,6 +18,11 @@ const app: Express = express();
 const port = process.env.PORT || 3000;
 
 app.use(express.json());
+app.use((req: Request, res: Response, next: NextFunction) => {
+  res.header("Access-Control-Allow-Origin", "*");
+  res.header("Access-Control-Allow-Headers", "Origin, X-Requested-With, Content-Type, Accept");
+  next();
+});
 
 const jwt = require("jsonwebtoken");
 require("dotenv").config();

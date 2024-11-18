@@ -1,52 +1,64 @@
 <template>
-    <navbar
-        :pages="pages"
-        :activePage="activePage"
-        :nav-link-click="(index: number) => activePage = index"
-    ></navbar>
+    <div class="app-container">
+        <navbar
+            :pages="pages"
+            :activePage="activePage"
+            :nav-link-click="(index: number) => activePage = index"
+        ></navbar>
 
-    <page-viewer 
-        :page="pages[activePage]"
-    ></page-viewer>
+        <div class="content">
+            <index
+                v-if="activePage == 0"
+                :go-to-map="() => activePage = 1"
+            ></index>
 
-    <leaflet-map
-        v-if="activePage == 1"
-    ></leaflet-map>
+            <leaflet-map
+                v-if="activePage == 1"
+            ></leaflet-map>
 
-    <api-test
-        v-if="activePage == 2"
-    ></api-test>
+            <api-test
+                v-if="activePage == 2"
+            ></api-test>
+            <!-- 
+                <page-viewer 
+                    :page="pages[activePage]"
+                ></page-viewer> -->
+        </div>
+    </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
   import { onMounted } from 'vue';
   import { type IStaticMethods } from "preline/preline";
+  import LeafletMap from './components/LeafletMap.vue';
+  import Navbar from './components/Navbar.vue';
+//   import PageViewer from './components/PageViewer.vue';
+  import ApiTest from './components/ApiTest.vue';
+  import Index from './components/Index.vue';
 
-  onMounted(() => {
-    setTimeout(() => {
-      window.HSStaticMethods.autoInit();
-    }, 100)
-  });
-</script>
 
-<script lang="ts">
   declare global {
     interface Window {
       HSStaticMethods: IStaticMethods;
     }
   }
   
-  import LeafletMap from './components/LeafletMap.vue';
-  import Navbar from './components/Navbar.vue';
-  import PageViewer from './components/PageViewer.vue';
-  import ApiTest from './components/ApiTest.vue';
 
   export default {
+    setup(){
+        onMounted(() => {
+            setTimeout(() => {
+            window.HSStaticMethods.autoInit();
+            }, 100);
+  });
+
+    },
       components: {
           Navbar,
-          PageViewer,
+        //   PageViewer,
           LeafletMap,
-          ApiTest
+          ApiTest,
+          Index
       },
       data() {
           return {

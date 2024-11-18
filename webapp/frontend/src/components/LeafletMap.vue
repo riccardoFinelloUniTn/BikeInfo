@@ -1,14 +1,13 @@
 <template>
-    <div>
-        <h3  class="pt-5">An interactive leaflet map</h3>
-        <div id="map" style="height:500px; width: 500px; margin-left: 25%;"></div>
+    <div class="pt-14">
+        <div id="map" class="mx-auto mt-10" style="height:500px; width: 500px;"></div>
     </div>
 </template>
 
 <script setup lang="ts">
     import { ref, onMounted } from 'vue';
     import "leaflet/dist/leaflet.css";
-    import * as L from 'leaflet';
+    import L from 'leaflet';
 
     const initialMap = ref();
 
@@ -17,5 +16,20 @@
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19
         }).addTo(initialMap.value);
+
+        if(!navigator.geolocation) {
+            alert('Geolocation is not supported by your browser');
+        } else {
+            navigator.geolocation.getCurrentPosition((position) => {
+                const { latitude, longitude } = position.coords;
+                initialMap.value.setView([latitude, longitude], 16);
+                var marker = L.marker([latitude, longitude]);
+                marker.bindPopup('Tu sei qui!').openPopup();
+                marker.addTo(initialMap.value);
+            }, () => {
+                alert('Unable to retrieve your location');
+            });
+        }
+        
     });
 </script>

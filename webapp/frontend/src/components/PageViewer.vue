@@ -1,8 +1,8 @@
 <template>
-    <div class="container m-8">
-        <h1 class="text-5xl font-bold">{{ page.pageTitle }}</h1>
+    <!-- <div class="container px-5 mt-5">
+        <h1 class="text-4xl font-bold">{{ page.pageTitle }}</h1>
         <p class="pt-3">{{ page.content }}</p>
-    </div>
+    </div> -->
 </template>
 
 <script lang="ts">

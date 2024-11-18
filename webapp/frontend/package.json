@@ -13,8 +13,6 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@headlessui/vue": "^1.7.23",
-    "@heroicons/vue": "^2.1.5",
     "@types/geojson": "^7946.0.14",
     "@types/leaflet": "^1.9.14",
     "leaflet": "^1.9.4",

@@ -12,9 +12,9 @@
                 :go-to-map="() => activePage = 1"
             ></index>
 
-            <leaflet-map
+            <google-map
                 v-if="activePage == 1"
-            ></leaflet-map>
+            ></google-map>
 
             <api-test
                 v-if="activePage == 2"
@@ -30,7 +30,7 @@
 <script lang="ts">
   import { onMounted } from 'vue';
   import { type IStaticMethods } from "preline/preline";
-  import LeafletMap from './components/LeafletMap.vue';
+  import GoogleMap from './components/GoogleMap.vue';
   import Navbar from './components/Navbar.vue';
 //   import PageViewer from './components/PageViewer.vue';
   import ApiTest from './components/ApiTest.vue';
@@ -56,7 +56,7 @@
       components: {
           Navbar,
         //   PageViewer,
-          LeafletMap,
+          GoogleMap,
           ApiTest,
           Index
       },

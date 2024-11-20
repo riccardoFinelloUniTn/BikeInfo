@@ -39,6 +39,7 @@ export const registerUser: RequestHandler = async (req: Request, res: Response) 
       email,
       password: hash,
       salt,
+      role: "user"
     });
 
     await newUser.save();

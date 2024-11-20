@@ -1,41 +1,40 @@
-import express, { Express, NextFunction, Request, Response } from "express";
+import { Request, Response, NextFunction } from "express";
+import jwt from "jsonwebtoken";
+import dotenv from "dotenv";
 
-//TODO password criptate con hash e salt con pbkdf2
-const app :Express = express();
-const jwt  = require("jsonwebtoken");
-require('dotenv').config();
+dotenv.config();
 
+export const tokenChecker = (req: Request, res: Response, next: NextFunction): void => {
+  if (!req) {
+    return;
+  }
 
-const tokenChecker = function(req : Request, res :Response, next : NextFunction) {
-	if(!req ){
-        return;
+  // Check header or URL parameters or post parameters for token
+  const token = req.headers["authorization"]?.split(" ")[1]; // Extract token from Bearer scheme
+
+  // If there is no token
+  if (!token) {
+    res.status(401).json({
+      success: false,
+      message: "No token provided.",
+    });
+    return;
+  }
+
+  // Decode token, verify secret, and check expiration
+  jwt.verify(token, process.env.SUPER_SECRET as string, (err, decoded) => {
+    if (err) {
+      res.status(403).json({
+        success: false,
+        message: "Failed to authenticate token.",
+      });
+      return;
     }
-   
-	// check header or url parameters or post parameters for token
-	var token =  req.headers["authorization"];
 
-	// if there is no token
-	if (!token) {
-		return res.status(401).send({ 
-			success: false,
-			message: 'No token provided.'
-		});
-	}
-
-	// decode token, verifies secret and checks exp
-	jwt.verify(token, process.env.SUPER_SECRET, function(err : Error, decoded : string) {			
-		if (err) {
-			return res.status(403).send({
-				success: false,
-				message: 'Failed to authenticate token.'
-			});		
-		} else {
-			// if everything is good, save to request for use in other routes
-			req.headers["loggedUser"] = decoded;
-			next();
-		}
-	});
-	
+    // If everything is good, attach the decoded token to the request object
+    req.headers["loggedUser"] = decoded as string; // Decoded payload (ensure type safety if needed)
+    next();
+  });
 };
 
-module.exports = tokenChecker
+export default tokenChecker;

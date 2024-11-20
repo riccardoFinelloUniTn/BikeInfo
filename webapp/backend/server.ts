@@ -9,6 +9,8 @@ import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getRastrelliere from "./opendata/rastrelliere";
 import { authenticateUser } from "./auth/authController";
 import { getReviewsByEntityId } from "./dataControllers/getReviews";
+import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
+import { tokenChecker } from "./auth/tokenChecker";
 
 
 dotenv.config();

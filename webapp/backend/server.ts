@@ -11,6 +11,7 @@ import { authenticateUser } from "./auth/authController";
 import { getReviewsByEntityId } from "./dataControllers/getReviews";
 import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
 import { tokenChecker } from "./auth/tokenChecker";
+import { postFeedback } from "./dataControllers/postFeedback";
 
 
 dotenv.config();
@@ -60,14 +61,6 @@ async function main() {
   ready = true;
 }
 
-// const kittySchema = new mongoose.Schema({
-//   name: String,
-// });
-
-// const Kitten = mongoose.model("Kitten", kittySchema);
-
-// const silence = new Kitten({ name: "Silence 5" });
-// console.log(silence.name); // 'Silence'
 
 app.get("/", (req: Request, res: Response) => {
   res.send("Hello World! Correct File");
@@ -134,3 +127,7 @@ app.get("/bikesharing", async function (req: Request, res: Response) {
 app.post("/auth", authenticateUser);
 
 app.post("/register", registerUser);
+
+app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
+
+app.post("/feedbacks/:eid", tokenChecker, postFeedback);

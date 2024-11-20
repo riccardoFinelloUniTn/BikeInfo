@@ -1,6 +1,10 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import feedbackModel from "../model/feedback.model";
 import jwt from "jsonwebtoken";
+import { v4 as uuidv4 } from "uuid"; // To generate unique `fid` values
+import dotenv from "dotenv";
+
+dotenv.config();
 
 export const postFeedback: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
   try {
@@ -29,21 +33,30 @@ export const postFeedback: RequestHandler = async (req: Request, res: Response, 
     }
 
     // Extract user email from the token payload
-    const userEmail = decoded.email;
+    const uEmail = decoded.email;
 
     // Extract feedback data from the request body
-    const { entityId, content, rating } = req.body;
-    if (!entityId || !content || typeof rating !== "number") {
-      res.status(400).json({ success: false, message: "Entity ID, content, and rating are required." });
+    const { entityId, comment } = req.body;
+
+    if (!entityId || !comment) {
+      res.status(400).json({
+        success: false,
+        message: "Entity ID, comment are required.",
+      });
       return;
     }
 
+    // Generate a unique `fid` for the feedback
+    const fid = uuidv4();
+
     // Save the feedback to the database
     const newFeedback = new feedbackModel({
+      fid,
       entityId,
-      uemail: userEmail,
-      content,
-      rating,
+      uEmail,
+      comment,
+      geolocation: "prova",
+      date: new Date(), // Current timestamp
     });
 
     await newFeedback.save();

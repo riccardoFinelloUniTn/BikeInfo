@@ -1,17 +1,17 @@
 import dotenv from "dotenv";
 import express, { Express, NextFunction, Request, Response } from "express";
+import { authenticateUser } from "./auth/authController";
+import { signInWithGoogle } from "./auth/googleAuth";
 import { registerUser } from "./auth/register";
-import reviewModel from "./model/review.model";
-import userModel from "./model/user.model";
+import { tokenChecker } from "./auth/tokenChecker";
+import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
+import { getReviewsByEntityId } from "./dataControllers/getReviews";
+import { postFeedback } from "./dataControllers/postFeedback";
+//import getBikeSharing from "./opendata/bikeSharing";
 import getCentroInBici from "./opendata/centroInBici";
 import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getRastrelliere from "./opendata/rastrelliere";
-import { authenticateUser } from "./auth/authController";
-import { getReviewsByEntityId } from "./dataControllers/getReviews";
-import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
-import { tokenChecker } from "./auth/tokenChecker";
-import { postFeedback } from "./dataControllers/postFeedback";
 
 
 dotenv.config();
@@ -48,22 +48,27 @@ async function main() {
   await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/InfoBikeDB");
   centro_in_bici = await getCentroInBici;
   parcheggio_protetto = await getParcheggioProtetto;
-  //bike_sharing = await getBikeSharing; TODO il server non risponde
+ // bike_sharing = await getBikeSharing;// TODO il server non risponde
   rastrelliere = await getRastrelliere;
   itinerari = await getItinerari;
-  // piste_ciclabili = await getPisteCiclabili; TODO controllare perche non vi è nessun file
-  console.log(centro_in_bici);
-  console.log(parcheggio_protetto);
-  console.log(bike_sharing);
-  console.log(rastrelliere);
-  console.log(itinerari);
-  console.log(piste_ciclabili);
+  // piste_ciclabili = await getPisteCiclabili;// TODO controllare perche non vi è nessun file
+  // console.log(centro_in_bici);
+  // console.log(parcheggio_protetto);
+  // console.log(bike_sharing);
+  // console.log(rastrelliere);
+  // console.log(itinerari);
+  // console.log(piste_ciclabili);
   ready = true;
 }
 
 
+app.get("/google/callback", tokenChecker , (req: Request, res: Response) => {
+
+  res.send("Hello google login");
+});
+
 app.get("/", (req: Request, res: Response) => {
-  res.send("Hello World! Correct File");
+  res.sendFile("testpage.html", { root: __dirname });
 });
 
 app.listen(port, () => {
@@ -125,6 +130,10 @@ app.get("/bikesharing", async function (req: Request, res: Response) {
 
 
 app.post("/auth", authenticateUser);
+
+app.post("/auth/google", signInWithGoogle);
+
+app.post("/register/google", signInWithGoogle);
 
 app.post("/register", registerUser);
 

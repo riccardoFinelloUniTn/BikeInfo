@@ -1,6 +1,6 @@
-import { Request, Response, NextFunction } from "express";
-import jwt from "jsonwebtoken";
 import dotenv from "dotenv";
+import { NextFunction, Request, Response } from "express";
+import jwt from "jsonwebtoken";
 
 dotenv.config();
 
@@ -22,7 +22,7 @@ export const tokenChecker = (req: Request, res: Response, next: NextFunction): v
   }
 
   // Decode token, verify secret, and check expiration
-  jwt.verify(token, process.env.SUPER_SECRET as string, (err, decoded) => {
+  jwt.verify(token, process.env.SUPER_SECRET!, (err, decoded) => {
     if (err) {
       res.status(403).json({
         success: false,

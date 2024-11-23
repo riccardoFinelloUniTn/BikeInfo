@@ -31,7 +31,7 @@
             <div class="text-center">
             <a 
                 @click.prevent="goToMap()"
-                class="cursor-pointer inline-flex justify-center items-center gap-x-3 text-center bg-gradient-to-tl from-green-700 to-green-850 shadow-lg shadow-transparent hover:shadow-green-700/50 border border-transparent text-white text-sm font-medium rounded-full focus:outline-none focus:shadow-green-700/50 py-3 px-6">
+                class="cursor-pointer inline-flex justify-center items-center gap-x-3 text-center bg-gradient-to-tl from-green-700 to-green-850 shadow-lg shadow-transparent hover:shadow-green-700/50 border border-transparent text-sm font-medium rounded-full focus:outline-none focus:shadow-green-700/50 py-3 px-6">
                 Provalo subito
                 <svg class="shrink-0 size-4" xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 18 6-6-6-6"/></svg>
             </a>

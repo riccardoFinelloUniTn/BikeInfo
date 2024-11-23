@@ -101,7 +101,7 @@ export default {
                     "ngrok-skip-browser-warning": "any"
                 },
             });
-            console.log(response);
+            console.log("-20$ dal conto");
             let data = await response.json();
             return data;
         } catch (error) {

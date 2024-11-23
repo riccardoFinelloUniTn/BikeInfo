@@ -12,7 +12,7 @@ import getCentroInBici from "./opendata/centroInBici";
 import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getRastrelliere from "./opendata/rastrelliere";
-
+const fs = require('node:fs/promises');
 
 dotenv.config();
 
@@ -45,14 +45,62 @@ let itinerari: any;
 let piste_ciclabili: any;
 let ready: boolean = false;
 
+
+
 async function main() {
   await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/InfoBikeDB");
-  centro_in_bici = await getCentroInBici;
-  parcheggio_protetto = await getParcheggioProtetto;
- // bike_sharing = await getBikeSharing;// TODO il server non risponde
-  rastrelliere = await getRastrelliere;
-  itinerari = await getItinerari;
-  // piste_ciclabili = await getPisteCiclabili;// TODO controllare perche non vi è nessun file
+   try{
+    centro_in_bici = await getCentroInBici;
+    parcheggio_protetto = await getParcheggioProtetto;
+   // bike_sharing = await getBikeSharing;// TODO il server non risponde
+    rastrelliere = await getRastrelliere;
+    itinerari = await getItinerari;
+    // piste_ciclabili = await getPisteCiclabili;// TODO controllare perche non vi è nessun file
+  } catch (err) {
+    try {
+      const data = await fs.readFile('dist/opendata/piste_ciclabili.geojson', { encoding: 'utf8' });
+      piste_ciclabili = JSON.parse(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      const data = await fs.readFile('dist/opendata/parcheggio_protetto_bike.geojson', { encoding: 'utf8' });
+      parcheggio_protetto = JSON.parse(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      const data = await fs.readFile('dist/opendata/rastrelliere.geojson', { encoding: 'utf8' });
+      rastrelliere = JSON.parse(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      const data = await fs.readFile('dist/opendata/centro_in_bici.geojson', { encoding: 'utf8' });
+      centro_in_bici = JSON.parse(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      const data = await fs.readFile('dist/opendata/itinerari.geojson', { encoding: 'utf8' });
+      itinerari = JSON.parse(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+    try {
+      const data = await fs.readFile('dist/opendata/bikeSharing.geojson', { encoding: 'utf8' });
+      bike_sharing = JSON.parse(data);
+      console.log(data);
+    } catch (err) {
+      console.log(err);
+    }
+  }
+ 
   // console.log(centro_in_bici);
   // console.log(parcheggio_protetto);
   // console.log(bike_sharing);

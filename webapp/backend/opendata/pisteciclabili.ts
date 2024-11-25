@@ -24,7 +24,7 @@ async function getPisteCiclabili() {
             .then(async (files: any[]) => {
               console.log("Decompression completed");
               let data: string = files[0].data.toString();
-              let centro_in_bici = await shapefile(data);
+              let centro_in_bici =JSON.parse(data);
               resolve(centro_in_bici);
             })
             .catch((error: Error) => {

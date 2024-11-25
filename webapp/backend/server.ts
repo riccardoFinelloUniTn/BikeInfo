@@ -56,6 +56,7 @@ async function main() {
     rastrelliere = await getRastrelliere;
     piste_ciclabili = await getPisteCiclabili;// TODO controllare perche non vi è nessun file
   } catch (err) {
+    
     try {
       const data = await fs.readFile('dist/opendata/piste_ciclabili.geojson', { encoding: 'utf8' });
       piste_ciclabili = JSON.parse(data);
@@ -84,6 +85,7 @@ async function main() {
     } catch (err) {
       console.log(err);
     }
+    console.log(err);
     // try {
     //   const data = await fs.readFile('dist/opendata/bikeSharing.geojson', { encoding: 'utf8' });
     //   bike_sharing = JSON.parse(data);

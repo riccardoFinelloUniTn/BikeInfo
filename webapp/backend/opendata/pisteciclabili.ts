@@ -3,15 +3,14 @@ import { Response } from "express";
 const shapefile = require("shapefile");
 const https = require("https"); 
 const fs = require("fs");
-const geojson = require("geojson");
 const decompress = require("decompress");
 
-const file = fs.createWriteStream("dist/opendata/bikesharing.zip");
+const file = fs.createWriteStream("dist/opendata/pisteciclabili.zip");
 
 async function getPisteCiclabili() {
   return new Promise((resolve: Function, reject: Function) => {
     https.get(
-      "https://webapps.comune.trento.it/cartografia/gis/dbexport?db=base&sc=mobilita&ly=piste_ciclabili&fr=shp",
+      "https://gis.comune.trento.it/dbexport?db=base&sc=mobilita&ly=piste_ciclabili&fr=geojson",
       function (response: Response) {
         response.pipe(file);
         file.on("finish", () => {
@@ -19,7 +18,7 @@ async function getPisteCiclabili() {
           console.log("Download Completed");
           console.log("Starting decompression");
           decompress(
-            "dist/opendata/bikesharing.zip",
+            "dist/opendata/pisteciclabili.zip",
             "dist/opendata"
           )
             .then(async (files: any[]) => {

@@ -7,10 +7,10 @@ import { tokenChecker } from "./auth/tokenChecker";
 import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
 import { getReviewsByEntityId } from "./dataControllers/getReviews";
 import { postFeedback } from "./dataControllers/postFeedback";
-//import getBikeSharing from "./opendata/bikeSharing";
+//import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
 import getCentroInBici from "./opendata/centroInBici";
-import getItinerari from "./opendata/itinerari";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
+import getPisteCiclabili from "./opendata/pisteciclabili";
 import getRastrelliere from "./opendata/rastrelliere";
 const fs = require('node:fs/promises');
 
@@ -54,8 +54,7 @@ async function main() {
     parcheggio_protetto = await getParcheggioProtetto;
    // bike_sharing = await getBikeSharing;// TODO il server non risponde
     rastrelliere = await getRastrelliere;
-    itinerari = await getItinerari;
-    // piste_ciclabili = await getPisteCiclabili;// TODO controllare perche non vi è nessun file
+    piste_ciclabili = await getPisteCiclabili;// TODO controllare perche non vi è nessun file
   } catch (err) {
     try {
       const data = await fs.readFile('dist/opendata/piste_ciclabili.geojson', { encoding: 'utf8' });
@@ -85,20 +84,13 @@ async function main() {
     } catch (err) {
       console.log(err);
     }
-    try {
-      const data = await fs.readFile('dist/opendata/itinerari.geojson', { encoding: 'utf8' });
-      itinerari = JSON.parse(data);
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
-    try {
-      const data = await fs.readFile('dist/opendata/bikeSharing.geojson', { encoding: 'utf8' });
-      bike_sharing = JSON.parse(data);
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
+    // try {
+    //   const data = await fs.readFile('dist/opendata/bikeSharing.geojson', { encoding: 'utf8' });
+    //   bike_sharing = JSON.parse(data);
+    //   console.log(data);
+    // } catch (err) {
+    //   console.log(err);
+    // }
   }
  
   // console.log(centro_in_bici);
@@ -140,6 +132,16 @@ app.get("/rastrelliere", async function (req: Request, res: Response) {
 app.get("/parcheggioprotetto", async function (req: Request, res: Response) {
   if (ready) {
     res.json(JSON.stringify(parcheggio_protetto));
+  }
+  else {
+    res.sendStatus(500);
+  }
+})
+
+
+app.get("/pisteciclabili", async function (req: Request, res: Response) {
+  if (ready) {
+    res.json(JSON.stringify(piste_ciclabili));
   }
   else {
     res.sendStatus(500);

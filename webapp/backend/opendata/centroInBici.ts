@@ -39,7 +39,7 @@ async function getCentroInBici() {
   });
 }
 
-export const adaptJsonToCentroInBici = async (jsonData: string): Promise<void> => {
+export const fetchAndRefreshCentroInBici = async (jsonData: string): Promise<void> => {
   try {
     const data = JSON.parse(jsonData);
 
@@ -47,6 +47,7 @@ export const adaptJsonToCentroInBici = async (jsonData: string): Promise<void> =
       throw new Error("Invalid JSON format: 'features' array missing.");
     }
 
+    // Extract and transform data
     const entities = data.features.map((feature: any) => {
       const { fumetto, desc, cicloposteggi } = feature.properties;
       const { coordinates } = feature.geometry;
@@ -56,25 +57,44 @@ export const adaptJsonToCentroInBici = async (jsonData: string): Promise<void> =
       }
 
       return {
-        eid: new mongoose.Types.ObjectId().toString(), // Generate a unique ID
-        name: fumetto,
-        description: `${desc} - ${cicloposteggi} posteggi`, // Combine description and posteggi info
-        geolocation: JSON.stringify(coordinates), // Store as stringified JSON
+        eid: fumetto.toString(),
+        name: desc,
+        description: `Cicloposteggi: ${cicloposteggi}`,
+        geolocation: JSON.stringify(coordinates),
         type: "centroInBici",
-        rating: 0, // Default rating
-        reviews: [], // Default empty array
-        feedbacks: [], // Default empty array
+        rating: 0,
+        reviews: [],
+        feedbacks: [],
       };
     });
 
-    // Insert all entities into the database
-    await entityModel.insertMany(entities);
-    console.log("C'entro in Bici entities successfully inserted.");
+    // Refresh database
+    const existingEntities = await entityModel.find({ type: "centroInBici" }).exec();
+
+    // Find entities to delete
+    const incomingIds = entities.map((entity:any) => entity.eid);
+    const toDelete = existingEntities.filter(
+      (existing) => !incomingIds.includes(existing.eid)
+    );
+
+    // Delete outdated entities
+    await Promise.all(toDelete.map((entity) => entityModel.deleteOne({ eid: entity.eid })));
+
+    // Upsert new/updated entities
+    await Promise.all(
+      entities.map((entity:any) =>
+        entityModel.updateOne(
+          { eid: entity.eid },
+          { $set: entity },
+          { upsert: true } // Insert if not exists
+        )
+      )
+    );
+
+    console.log("Centro in Bici entities refreshed successfully.");
   } catch (error) {
-    console.error("Error adapting JSON to Entity schema:", error);
+    console.error("Error refreshing centro in bici:", error);
   }
 };
-    
+
 export default getCentroInBici();
-
-

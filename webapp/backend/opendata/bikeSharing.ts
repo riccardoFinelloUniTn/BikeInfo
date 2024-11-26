@@ -36,7 +36,7 @@ async function getBikeSharingTrento() {
     );
   });
 }
-    
+  
 export default getBikeSharingTrento();
 
 

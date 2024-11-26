@@ -12,6 +12,9 @@ import getCentroInBici from "./opendata/centroInBici";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getPisteCiclabili from "./opendata/pisteciclabili";
 import getRastrelliere from "./opendata/rastrelliere";
+import { fetchAndRefreshRastrelliere } from "./opendata/rastrelliere";
+import { fetchAndRefreshParcheggioProtetto } from "./opendata/parcheggioprotetto";
+import { fetchAndRefreshCentroInBici } from "./opendata/centroInBici";
 const fs = require('node:fs/promises');
 
 dotenv.config();
@@ -50,6 +53,14 @@ let ready: boolean = false;
 async function main() {
   await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/InfoBikeDB");
    try{
+
+    
+
+// Call them with appropriate JSON data
+
+
+
+
     centro_in_bici = await getCentroInBici;
     parcheggio_protetto = await getParcheggioProtetto;
    // bike_sharing = await getBikeSharing;// TODO il server non risponde
@@ -86,6 +97,10 @@ async function main() {
       console.log(err);
     }
     console.log(err);
+
+    await fetchAndRefreshRastrelliere(rastrelliere);
+    await fetchAndRefreshParcheggioProtetto(parcheggio_protetto);
+    await fetchAndRefreshCentroInBici(centro_in_bici);
     // try {
     //   const data = await fs.readFile('dist/opendata/bikeSharing.geojson', { encoding: 'utf8' });
     //   bike_sharing = JSON.parse(data);
@@ -193,3 +208,4 @@ app.post("/register", registerUser);
 app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
 
 app.post("/feedbacks/:eid", tokenChecker, postFeedback);
+

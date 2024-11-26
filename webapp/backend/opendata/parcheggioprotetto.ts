@@ -44,7 +44,7 @@ async function getParcheggioProtetto() {
 
 
 
-export const adaptJsonToProtectedParking = async (jsonData: string): Promise<void> => {
+export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promise<void> => {
   try {
     const data = JSON.parse(jsonData);
 
@@ -52,6 +52,7 @@ export const adaptJsonToProtectedParking = async (jsonData: string): Promise<voi
       throw new Error("Invalid JSON format: 'features' array missing.");
     }
 
+    // Extract and transform data
     const entities = data.features.map((feature: any) => {
       const { id, zona, tipologia } = feature.properties;
       const { coordinates } = feature.geometry;
@@ -64,19 +65,40 @@ export const adaptJsonToProtectedParking = async (jsonData: string): Promise<voi
         eid: id.toString(),
         name: zona,
         description: tipologia,
-        geolocation: JSON.stringify(coordinates), // Store as stringified JSON
+        geolocation: JSON.stringify(coordinates),
         type: "parcheggioProtetto",
-        rating: 0, // Default rating
-        reviews: [], // Default empty array
-        feedbacks: [], // Default empty array
+        rating: 0,
+        reviews: [],
+        feedbacks: [],
       };
     });
 
-    // Insert all entities into the database
-    await entityModel.insertMany(entities);
-    console.log("Protected Parking entities successfully inserted.");
+    // Refresh database
+    const existingEntities = await entityModel.find({ type: "parcheggioProtetto" }).exec();
+
+    // Find entities to delete
+    const incomingIds = entities.map((entity:any) => entity.eid);
+    const toDelete = existingEntities.filter(
+      (existing) => !incomingIds.includes(existing.eid)
+    );
+
+    // Delete outdated entities
+    await Promise.all(toDelete.map((entity) => entityModel.deleteOne({ eid: entity.eid })));
+
+    // Upsert new/updated entities
+    await Promise.all(
+      entities.map((entity:any) =>
+        entityModel.updateOne(
+          { eid: entity.eid },
+          { $set: entity },
+          { upsert: true } // Insert if not exists
+        )
+      )
+    );
+
+    console.log("Parcheggio Protetto entities refreshed successfully.");
   } catch (error) {
-    console.error("Error adapting JSON to Entity schema:", error);
+    console.error("Error refreshing parcheggio protetto:", error);
   }
 };
 

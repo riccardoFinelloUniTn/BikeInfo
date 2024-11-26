@@ -3,6 +3,8 @@ const fs = require("fs");
 const geojson = require("geojson");
 const decompress = require("decompress");
 import { Response } from "express";
+import entityModel from "../model/entity.model";
+import mongoose from "mongoose";
 
 const file = fs.createWriteStream("dist/opendata/rastrelliere.zip");
 
@@ -38,5 +40,43 @@ async function getRastrelliere() {
       });
   });
 }
+
+
+export const adaptJsonToEntity = async (jsonData: string): Promise<void> => {
+  try {
+    const data = JSON.parse(jsonData);
+
+    if (!data.features || !Array.isArray(data.features)) {
+      throw new Error("Invalid JSON format: 'features' array missing.");
+    }
+
+    const entities = data.features.map((feature: any) => {
+      const { id, zona, tipologia } = feature.properties;
+      const { coordinates } = feature.geometry;
+
+      if (!id || !zona || !tipologia || !coordinates) {
+        throw new Error("Invalid JSON structure: Missing required fields.");
+      }
+
+      return {
+        eid: id.toString(),
+        name: zona,
+        description: tipologia,
+        geolocation: JSON.stringify(coordinates), // Store as stringified JSON
+        type: "rastrelliera",
+        rating: 0, // Default rating
+        reviews: [], // Default empty array
+        feedbacks: [], // Default empty array
+      };
+    });
+
+    // Insert all entities into the database
+    await entityModel.insertMany(entities);
+    console.log("Entities successfully inserted.");
+  } catch (error) {
+    console.error("Error adapting JSON to Entity schema:", error);
+  }
+};
+
 
 export default getRastrelliere();

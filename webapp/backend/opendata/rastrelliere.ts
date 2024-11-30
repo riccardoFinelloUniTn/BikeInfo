@@ -42,7 +42,7 @@ async function getRastrelliere() {
 }
 
 
-export const adaptJsonToEntity = async (jsonData: string): Promise<void> => {
+export const fetchAndRefreshRastrelliere = async (jsonData: string): Promise<void> => {
   try {
     const data = JSON.parse(jsonData);
 
@@ -62,19 +62,18 @@ export const adaptJsonToEntity = async (jsonData: string): Promise<void> => {
         eid: id.toString(),
         name: zona,
         description: tipologia,
-        geolocation: JSON.stringify(coordinates), // Store as stringified JSON
+        geolocation: JSON.stringify(coordinates),
         type: "rastrelliera",
-        rating: 0, // Default rating
-        reviews: [], // Default empty array
-        feedbacks: [], // Default empty array
+        rating: 0,
+        reviews: [],
+        feedbacks: [],
       };
     });
 
-    // Insert all entities into the database
     await entityModel.insertMany(entities);
-    console.log("Entities successfully inserted.");
+    console.log("Rastrelliere data successfully inserted.");
   } catch (error) {
-    console.error("Error adapting JSON to Entity schema:", error);
+    console.error("Error in fetchAndRefreshRastrelliere:", error);
   }
 };
 

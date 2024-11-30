@@ -7,7 +7,7 @@ import { tokenChecker } from "./auth/tokenChecker";
 import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
 import { getReviewsByEntityId } from "./dataControllers/getReviews";
 import { postFeedback } from "./dataControllers/postFeedback";
-//import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
+import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
 import getCentroInBici from "./opendata/centroInBici";
 import getParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getPisteCiclabili from "./opendata/pisteciclabili";
@@ -15,11 +15,10 @@ import getRastrelliere from "./opendata/rastrelliere";
 import { fetchAndRefreshRastrelliere } from "./opendata/rastrelliere";
 import { fetchAndRefreshParcheggioProtetto } from "./opendata/parcheggioprotetto";
 import { fetchAndRefreshCentroInBici } from "./opendata/centroInBici";
+import { fetchAndRefreshPisteCiclabili } from "./opendata/pisteciclabili";
 const fs = require('node:fs/promises');
 
 dotenv.config();
-
-
 
 const app: Express = express();
 const port = process.env.PORT || 3000;
@@ -36,8 +35,6 @@ const jwt = require("jsonwebtoken");
 require("dotenv").config();
 
 const mongoose = require("mongoose");
-main().catch((err) => console.log(err));
-
 require("dotenv").config();
 
 let centro_in_bici: any;
@@ -48,164 +45,97 @@ let itinerari: any;
 let piste_ciclabili: any;
 let ready: boolean = false;
 
-
-
+// Run the main function
 async function main() {
-  await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/InfoBikeDB");
-   try{
+  try {
+    console.log("Connecting to MongoDB...");
+    await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/InfoBikeDB");
+    console.log("Connected to MongoDB.");
 
-    
+    // Attempt to fetch data from external sources
+    console.log("Fetching data from external sources...");
+    try {
+      centro_in_bici = await getCentroInBici;
+      parcheggio_protetto = await getParcheggioProtetto;
+      rastrelliere = await getRastrelliere;
+      piste_ciclabili = await getPisteCiclabili;
+    } catch (err) {
+      console.log("Error fetching data from external sources, falling back to local files.", err);
+    }
 
-// Call them with appropriate JSON data
+    // Fallback to reading data from local files if necessary
+    console.log("Loading fallback data from local files...");
 
+    if (!centro_in_bici) {
+      try {
+        const data = await fs.readFile('dist/opendata/centro_in_bici.geojson', { encoding: 'utf8' });
+        centro_in_bici = JSON.parse(data);
+        await fetchAndRefreshCentroInBici(centro_in_bici);
+        console.log("Centro in Bici data loaded from file.");
+      } catch (err) {
+        console.log("Error loading centro_in_bici from file:", err);
+      }
+    }
 
+    if (!parcheggio_protetto) {
+      try {
+        const data = await fs.readFile('dist/opendata/parcheggio_protetto_bike.geojson', { encoding: 'utf8' });
+        parcheggio_protetto = JSON.parse(data);
+        await fetchAndRefreshParcheggioProtetto(parcheggio_protetto);
+        console.log("Parcheggio Protetto data loaded from file.");
+      } catch (err) {
+        console.log("Error loading parcheggio_protetto from file:", err);
+      }
+    }
 
+    if (!rastrelliere) {
+      try {
+        const data = await fs.readFile('dist/opendata/rastrelliere.geojson', { encoding: 'utf8' });
+        rastrelliere = JSON.parse(data);
+        await fetchAndRefreshRastrelliere(rastrelliere);
+        console.log("Rastrelliere data loaded from file.");
+      } catch (err) {
+        console.log("Error loading rastrelliere from file:", err);
+      }
+    }
 
-    centro_in_bici = await getCentroInBici;
-    parcheggio_protetto = await getParcheggioProtetto;
-   // bike_sharing = await getBikeSharing;// TODO il server non risponde
-    rastrelliere = await getRastrelliere;
-    piste_ciclabili = await getPisteCiclabili;// TODO controllare perche non vi è nessun file
+    if (!piste_ciclabili) {
+      try {
+        const data = await fs.readFile('dist/opendata/piste_ciclabili.geojson', { encoding: 'utf8' });
+        piste_ciclabili = JSON.parse(data);
+        await fetchAndRefreshPisteCiclabili(piste_ciclabili);
+        console.log("Piste Ciclabili data loaded from file.");
+      } catch (err) {
+        console.log("Error loading piste_ciclabili from file:", err);
+      }
+    }
+
+    console.log("Data fetching and processing complete.");
+
+    // Start the server after all initialization is complete
+    ready = true;
   } catch (err) {
-    
-    try {
-      const data = await fs.readFile('dist/opendata/piste_ciclabili.geojson', { encoding: 'utf8' });
-      piste_ciclabili = JSON.parse(data);
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
-    try {
-      const data = await fs.readFile('dist/opendata/parcheggio_protetto_bike.geojson', { encoding: 'utf8' });
-      parcheggio_protetto = JSON.parse(data);
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
-    try {
-      const data = await fs.readFile('dist/opendata/rastrelliere.geojson', { encoding: 'utf8' });
-      rastrelliere = JSON.parse(data);
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
-    try {
-      const data = await fs.readFile('dist/opendata/centro_in_bici.geojson', { encoding: 'utf8' });
-      centro_in_bici = JSON.parse(data);
-      console.log(data);
-    } catch (err) {
-      console.log(err);
-    }
-    console.log(err);
-
-    await fetchAndRefreshRastrelliere(rastrelliere);
-    await fetchAndRefreshParcheggioProtetto(parcheggio_protetto);
-    await fetchAndRefreshCentroInBici(centro_in_bici);
-    // try {
-    //   const data = await fs.readFile('dist/opendata/bikeSharing.geojson', { encoding: 'utf8' });
-    //   bike_sharing = JSON.parse(data);
-    //   console.log(data);
-    // } catch (err) {
-    //   console.log(err);
-    // }
+    console.error("Error during initialization:", err);
+    process.exit(1); // Exit with error code if something goes wrong
   }
- 
-  // console.log(centro_in_bici);
-  // console.log(parcheggio_protetto);
-  // console.log(bike_sharing);
-  // console.log(rastrelliere);
-  // console.log(itinerari);
-  // console.log(piste_ciclabili);
-  ready = true;
 }
 
+main()
+  .then(() => {
+    console.log("Starting the Express server...");
+    app.listen(port, () => {
+      console.log(`Server is running on port ${port}`);
+    });
+  })
+  .catch((err) => {
+    console.error("Error during initialization:", err);
+    process.exit(1); // Exit with error code if there's an issue
+  });
 
-app.get("/google/callback", tokenChecker , (req: Request, res: Response) => {
-
-  res.send("Hello google login");
-});
-
-app.get("/", (req: Request, res: Response) => {
-  res.sendFile("testpage.html", { root: __dirname });
-});
-
-app.listen(port, () => {
-  console.log(`Example app listening on port http://localhost:${port}`);
-});
-
-
-app.get("/reviews/:eid", getReviewsByEntityId);
-
-app.get("/rastrelliere", async function (req: Request, res: Response) {
-  if (ready) {
-    res.json(JSON.stringify(rastrelliere));
-  }
-  else {
-    res.sendStatus(500);
-  }
-})
-
-
-app.get("/parcheggioprotetto", async function (req: Request, res: Response) {
-  if (ready) {
-    res.json(JSON.stringify(parcheggio_protetto));
-  }
-  else {
-    res.sendStatus(500);
-  }
-})
-
-
-app.get("/pisteciclabili", async function (req: Request, res: Response) {
-  if (ready) {
-    res.json(JSON.stringify(piste_ciclabili));
-  }
-  else {
-    res.sendStatus(500);
-  }
-})
-
-
-app.get("/itinerari", async function (req: Request, res: Response) {
-  if (ready) {
-    res.json(JSON.stringify(itinerari));
-  }
-  else {
-    res.sendStatus(500);
-  }
-})
-
-
-app.get("/centroinbici", async function (req: Request, res: Response) {
-  if (ready) {
-    res.json(JSON.stringify(centro_in_bici));
-  }
-  else {
-    res.sendStatus(500);
-  }
-})
-
-
-app.get("/bikesharing", async function (req: Request, res: Response) {
-  if (ready) {
-    res.json(JSON.stringify(bike_sharing));
-  }
-  else {
-    res.sendStatus(500);
-  }
-})
-
-
-
+// Express route definitions
 app.post("/auth", authenticateUser);
-
 app.post("/auth/google", signInWithGoogle);
-
 app.post("/register/google", signInWithGoogle);
-
 app.post("/register", registerUser);
-
 app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
-
 app.post("/feedbacks/:eid", tokenChecker, postFeedback);
-

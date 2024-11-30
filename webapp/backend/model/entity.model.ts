@@ -1,7 +1,7 @@
 import mongoose, { Document, Schema } from 'mongoose';
 
 // Define the Entity interface for TypeScript
-interface IEntity extends Document {
+export interface IEntity extends Document {  // Add "export" here
   eid: string;
   name: string;
   description: string;
@@ -20,7 +20,7 @@ const entitySchema: Schema = new mongoose.Schema({
   type: { type: String, required: true },
   rating: { type: Number, required: true },
   reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
-  feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }]
+  feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }],
 });
 
 // Export the Entity model with IEntity type

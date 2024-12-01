@@ -1,29 +1,33 @@
 <template>
-    <div class="app-container">
+    <div class="h-full w-full">
         <navbar 
             :pages="pages" 
             :activePage="activePage" 
-            :nav-link-click="(index: number) => (activePage = index)">
+            :nav-link-click="async (index: number) => {
+                // activePage = index;
+                $router.push(pages[index].link.url);
+                index == 1 ? await panToUser() : null;
+            }">
         </navbar>
 
         <div class="content">
-            <index 
+            <RouterView
                 v-if="activePage == 0" 
-                :go-to-map="() => (activePage = 1)"
-            ></index>
-
-            <google-map 
-                v-if="activePage == 1"
+                :go-to-map="async () => {
+                    await panToUser();
+                    $router.push(pages[1].link.url);
+                }"
+            ></RouterView>
+            <RouterView
+                v-if="activePage == 1 && rangeError != 0"
                 :rastLocs="rastrelliere"
-            ></google-map>
+                :userLatLng="userLatLng"
+                :rangeError="rangeError"
+            ></RouterView>
 
-            <api-test 
+            <RouterView
                 v-if="activePage == 2"
-            ></api-test>
-            <!-- 
-                <page-viewer 
-                    :page="pages[activePage]"
-                ></page-viewer> -->
+            ></RouterView>
         </div>
     </div>
 </template>
@@ -33,9 +37,9 @@ import { onMounted } from 'vue'
 import { type IStaticMethods } from 'preline/preline'
 import GoogleMap from './components/GoogleMap.vue'
 import Navbar from './components/Navbar.vue'
-//   import PageViewer from './components/PageViewer.vue';
-import ApiTest from './components/ApiTest.vue'
 import Index from './components/Index.vue'
+import RegLogController from './components/RegLogController.vue'
+import { RouterView } from 'vue-router'
 
 declare global {
     interface Window {
@@ -53,60 +57,91 @@ export default {
     },
     components: {
         Navbar,
-        //   PageViewer,
         GoogleMap,
-        ApiTest,
         Index,
-    },
-    computed: {
-        
+        RegLogController,
     },
     data() {
+
         return {
+            rangeError: 0,
+            userLatLng: {
+                lat: 0,
+                lng: 0,
+            },
             rastrelliere: [],
             activePage: 0,
             pages: [
                 {
-                    link: { text: 'Home', url: 'index.html' },
+                    link: { text: 'Home', url: '/' },
                     pageTitle: 'Home Page',
                     content: 'This is the home page.',
                 },
                 {
-                    link: { text: 'Map', url: 'map.html' },
+                    link: { text: 'Map', url: '/map' },
                     pageTitle: 'Map Page',
                     content: 'This is the map page.',
                 },
                 {
-                    link: { text: 'Login/Register', url: 'api.html' },
-                    pageTitle: 'Api Page',
-                    content: 'This is the api test page.',
-                },
-                // {
-                //     link: {text: 'Services', url: 'services.html'},
-                //     pageTitle: 'Services Page',
-                //     content: 'This is the'
-                // }
+                    link: { text: 'Login/Register', url: '/login' },
+                    pageTitle: 'Login Page',
+                    content: 'This is the login page.',
+                }
             ],
         }
     },
     async mounted() {
-        this.rastrelliere = await this.getRastrelliere();
-    },
-    methods: {
-        async getRastrelliere() {
         try {
-            let response = await fetch("https://improved-bright-alien.ngrok-free.app/rastrelliere", {
-                method: "GET",
-                headers: {
-                    "ngrok-skip-browser-warning": "any"
-                },
-            });
-            console.log("-20$ dal conto");
-            let data = await response.json();
-            return data;
+            this.rastrelliere = await this.getRastrelliere();
         } catch (error) {
-            return "ERROR: " + JSON.stringify(error);
+            console.error("Failed to fetch rastrelliere:", error);
+            if ((error as any).message.includes("500")) {
+                this.activePage = 0; // Stay on the current page if server error occurs
+            }
         }
+    },
+
+    methods: {
+        panToUser(): Promise<GeolocationPosition> {
+            return new Promise((resolve, reject) => {
+                navigator.geolocation.getCurrentPosition(
+                    // Success
+                    (position: GeolocationPosition) => {
+                        this.rangeError = position.coords.accuracy;
+                        this.userLatLng = {
+                            lat: position.coords.latitude,
+                            lng: position.coords.longitude,
+                        };
+                        resolve(position);
+                    },
+                    // Error
+                    () => {
+                        console.log("Error in the geolocation service.");
+                        reject();
+                    },
+                    // Options
+                    {
+                        enableHighAccuracy: false
+                    }
+                );
+            });
+        },
+
+
+        // API CALLS
+        async getRastrelliere() {
+            try {
+                let response = await fetch("https://improved-bright-alien.ngrok-free.app/rastrelliere", {
+                    method: "GET",
+                    headers: {
+                        "ngrok-skip-browser-warning": "any"
+                    },
+                });
+                let data = await response.json();
+                return data;
+            } catch (error) {
+                return "ERROR: " + JSON.stringify(error);
+            }
         }
     }
 }

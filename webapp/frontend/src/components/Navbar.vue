@@ -1,7 +1,7 @@
 <template>
     <!-- ========== HEADER ========== -->
     <header class="absolute top-0 inset-x-0 flex flex-wrap md:justify-start md:flex-nowrap z-50 w-4/5 mx-auto text-sm">
-      <nav class="mt-4 relative max-w-2xl w-full bg-[#EDF1D6] border border-gray-200 rounded-[2rem] mx-2 py-2.5 md:flex md:items-center md:justify-between md:py-0 md:px-4 md:mx-auto dark:bg-neutral-900 dark:border-neutral-700">
+      <nav class="shadow mt-4 relative max-w-2xl w-full bg-[#EDF1D6] border border-gray-200 rounded-[2rem] mx-2 py-2.5 md:flex md:items-center md:justify-between md:py-0 md:px-4 md:mx-auto dark:bg-neutral-900 dark:border-neutral-700">
         <div class="px-4 md:px-0 flex md:justify-between items-center">
           <!-- Logo -->
           <div>
@@ -70,14 +70,23 @@
 
         <div id="hs-navbar-header-floating" class="hidden hs-collapse overflow-hidden transition-all duration-300 basis-full grow md:block" aria-labelledby="hs-navbar-header-floating-collapse">
           <div class="mr-auto flex flex-col md:flex-row md:items-center md:justify-end gap-2 md:gap-3 mt-3 md:mt-0 py-2 md:py-0 md:ps-7">
-            <a 
+            <!-- <a 
               v-for="(page, index) in pages" 
               :key="index"
               @click.prevent="navLinkClick(index)"
               :href="page.link.url"
               aria-current="page"
               class="py-0.5 md:py-3 px-4 md:px-1 border-s-2 md:border-s-0 md:border-b-2 border-transparent text-gray-500 hover:text-gray-800 focus:outline-none dark:text-neutral-400 dark:hover:text-neutral-200"
-            > {{ page.link.text }} </a>
+            > {{ page.link.text }} </a> -->
+            <RouterLink
+              v-for="(page, index) in pages" 
+              :key="index"
+              @click.prevent="navLinkClick(index)"
+              :to="page.link.url"
+              aria-current="page"
+              class="py-0.5 md:py-3 px-4 md:px-1 border-s-2 md:border-s-0 md:border-b-2 border-transparent text-gray-500 hover:text-gray-800 focus:outline-none dark:text-neutral-400 dark:hover:text-neutral-200"
+            > {{ page.link.text }} 
+            </RouterLink>
           </div>
         </div>
       </nav>

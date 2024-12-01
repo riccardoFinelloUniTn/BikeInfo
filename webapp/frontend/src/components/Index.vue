@@ -44,6 +44,7 @@
 
 <script lang="ts">
     export default{
+        name: 'Index',
         props: ['goToMap'],
     }
 </script>

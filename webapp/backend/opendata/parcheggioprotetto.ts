@@ -1,5 +1,5 @@
 
-
+import crypto from "crypto";
 const https = require("https"); // or 'https' for https:// URLs
 const fs = require("fs");
 const geojson = require("geojson");
@@ -42,7 +42,15 @@ async function getParcheggioProtetto() {
 }
     
 
-
+interface GeoJSONFeature {
+  properties: {
+    zona: string;
+    tipologia: string;
+  };
+  geometry: {
+    coordinates: any; // Specify a more accurate type if known
+  };
+}
 
 export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promise<void> => {
   try {
@@ -52,53 +60,45 @@ export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promi
       throw new Error("Invalid JSON format: 'features' array missing.");
     }
 
-    // Extract and transform data
-    const entities = data.features.map((feature: any) => {
-      const { id, zona, tipologia } = feature.properties;
-      const { coordinates } = feature.geometry;
+    const operations = data.features
+      .map((feature: GeoJSONFeature) => {
+        const { zona, tipologia } = feature.properties;
+        const { coordinates } = feature.geometry;
 
-      if (!id || !zona || !tipologia || !coordinates) {
-        throw new Error("Invalid JSON structure: Missing required fields.");
-      }
+        if (!zona || !tipologia || !coordinates) {
+          console.log("Missing fields in feature:", feature);
+          return null;
+        }
 
-      return {
-        eid: id.toString(),
-        name: zona,
-        description: tipologia,
-        geolocation: JSON.stringify(coordinates),
-        type: "parcheggioProtetto",
-        rating: 0,
-        reviews: [],
-        feedbacks: [],
-      };
-    });
+        const eid = crypto.createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
 
-    // Refresh database
-    const existingEntities = await entityModel.find({ type: "parcheggioProtetto" }).exec();
+        return {
+          updateOne: {
+            filter: { eid }, // Match by hashed `eid`
+            update: {
+              eid,
+              name: zona,
+              description: tipologia,
+              geolocation: JSON.stringify(coordinates),
+              type: "parcheggioProtetto",
+              rating: 0,
+              //reviews: 0,
+              feedbacks: [],
+            },
+            upsert: true, // Insert if not found
+          },
+        };
+      })
+      .filter((op:any): op is Exclude<typeof op, null> => op !== null); // Filter out null values
 
-    // Find entities to delete
-    const incomingIds = entities.map((entity:any) => entity.eid);
-    const toDelete = existingEntities.filter(
-      (existing) => !incomingIds.includes(existing.eid)
-    );
-
-    // Delete outdated entities
-    await Promise.all(toDelete.map((entity) => entityModel.deleteOne({ eid: entity.eid })));
-
-    // Upsert new/updated entities
-    await Promise.all(
-      entities.map((entity:any) =>
-        entityModel.updateOne(
-          { eid: entity.eid },
-          { $set: entity },
-          { upsert: true } // Insert if not exists
-        )
-      )
-    );
-
-    console.log("Parcheggio Protetto entities refreshed successfully.");
+    if (operations.length > 0) {
+      await entityModel.bulkWrite(operations); // Perform bulk insert/update operations
+      console.log("Parcheggio Protetto data successfully inserted/updated.");
+    } else {
+      console.log("No valid features to insert or update.");
+    }
   } catch (error) {
-    console.error("Error refreshing parcheggio protetto:", error);
+    console.error("Error refreshing Parcheggio Protetto:", error);
   }
 };
 

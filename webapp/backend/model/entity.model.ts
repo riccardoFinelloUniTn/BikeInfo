@@ -8,7 +8,7 @@ export interface IEntity extends Document {  // Add "export" here
   geolocation: string;
   type: string;
   rating: number;
-  reviews: mongoose.Types.ObjectId[]; // References to Review model
+  //reviews: number;
   feedbacks: mongoose.Types.ObjectId[]; // References to Feedback model
 }
 
@@ -19,7 +19,7 @@ const entitySchema: Schema = new mongoose.Schema({
   geolocation: { type: String, required: true },
   type: { type: String, required: true },
   rating: { type: Number, required: true },
-  reviews: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Review' }],
+  //reviews: { type: Number, required: true},
   feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }],
 });
 

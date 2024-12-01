@@ -1,6 +1,7 @@
 import { Response } from "express";
 import entityModel from "../model/entity.model";
 import { IEntity } from "../model/entity.model";
+import crypto from "crypto";
 
 const shapefile = require("shapefile");
 const https = require("https"); 
@@ -39,6 +40,18 @@ async function getPisteCiclabili() {
   });
 }
 
+
+
+interface GeoJSONFeature {
+  properties: {
+    descrizione: string;
+    tipologia: string;
+  };
+  geometry: {
+    coordinates: any; // Specify a more accurate type if available
+  };
+}
+
 export const fetchAndRefreshPisteCiclabili = async (jsonData: string): Promise<void> => {
   try {
     const data = JSON.parse(jsonData);
@@ -47,28 +60,45 @@ export const fetchAndRefreshPisteCiclabili = async (jsonData: string): Promise<v
       throw new Error("Invalid JSON format: 'features' array missing.");
     }
 
-    const entities = data.features.map((feature: any) => {
-      const { descrizione, tipologia, anno } = feature.properties;
-      const { coordinates } = feature.geometry;
+    const operations = data.features
+      .map((feature: GeoJSONFeature) => {
+        const { descrizione, tipologia } = feature.properties;
+        const { coordinates } = feature.geometry;
 
-      if (!descrizione || !tipologia || !anno || !coordinates) {
-        throw new Error("Invalid JSON structure: Missing required fields.");
-      }
+        if (!descrizione || !tipologia || !coordinates) {
+          console.log("desc:" + descrizione);
+          console.log("type:" + tipologia);
+          console.log("coord:" + coordinates);
+          return null;
+        }
 
-      return {
-        eid: `${descrizione}-${tipologia}-${anno}`, // Construct a unique ID
-        name: descrizione,
-        description: tipologia,
-        geolocation: JSON.stringify(coordinates),
-        type: "pistaCiclabile",
-        rating: 0,
-        reviews: [],
-        feedbacks: [],
-      };
-    });
+        const eid = crypto.createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
 
-    await entityModel.insertMany(entities);
-    console.log("Piste Ciclabili data successfully inserted.");
+        return {
+          updateOne: {
+            filter: { eid }, // Match existing documents by unique `eid`
+            update: {
+              eid,
+              name: descrizione,
+              description: tipologia,
+              geolocation: JSON.stringify(coordinates),
+              type: "pistaCiclabile",
+              rating: 0,
+              //reviews: 0,
+              feedbacks: [],
+            },
+            upsert: true, // Insert if no document matches the `filter`
+          },
+        };
+      })
+      .filter((op:any): op is Exclude<typeof op, null> => op !== null); // Explicit type refinement
+
+    if (operations.length > 0) {
+      await entityModel.bulkWrite(operations); // Use bulkWrite for batch operations
+      console.log("Piste Ciclabili data successfully inserted/updated.");
+    } else {
+      console.log("No valid features to insert or update.");
+    }
   } catch (error) {
     console.error("Error in fetchAndRefreshPisteCiclabili:", error);
   }

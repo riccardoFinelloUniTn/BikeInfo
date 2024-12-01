@@ -5,6 +5,7 @@ const decompress = require("decompress");
 import { Response } from "express";
 import entityModel from "../model/entity.model";
 import mongoose from "mongoose";
+import crypto from "crypto";
 
 const file = fs.createWriteStream("dist/opendata/rastrelliere.zip");
 
@@ -50,28 +51,43 @@ export const fetchAndRefreshRastrelliere = async (jsonData: string): Promise<voi
       throw new Error("Invalid JSON format: 'features' array missing.");
     }
 
-    const entities = data.features.map((feature: any) => {
-      const { id, zona, tipologia } = feature.properties;
-      const { coordinates } = feature.geometry;
+    const operations = data.features
+      .map((feature: any) => {
+        const { zona, tipologia } = feature.properties;
+        const { coordinates } = feature.geometry;
 
-      if (!id || !zona || !tipologia || !coordinates) {
-        throw new Error("Invalid JSON structure: Missing required fields.");
-      }
+        if (!zona || !tipologia || !coordinates) {
+          console.log("Invalid feature:", feature);
+          return null;
+        }
 
-      return {
-        eid: id.toString(),
-        name: zona,
-        description: tipologia,
-        geolocation: JSON.stringify(coordinates),
-        type: "rastrelliera",
-        rating: 0,
-        reviews: [],
-        feedbacks: [],
-      };
-    });
+        const eid = crypto.createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
 
-    await entityModel.insertMany(entities);
-    console.log("Rastrelliere data successfully inserted.");
+        return {
+          updateOne: {
+            filter: { eid }, // Match by hashed `eid`
+            update: {
+              eid,
+              name: zona,
+              description: tipologia,
+              geolocation: JSON.stringify(coordinates),
+              type: "rastrelliera",
+              rating: 0,
+              //reviews: 0,
+              feedbacks: [],
+            },
+            upsert: true, // Insert if not found
+          },
+        };
+      })
+      .filter((op:any): op is Exclude<typeof op, null> => op !== null); // Filter out null operations
+
+    if (operations.length > 0) {
+      await entityModel.bulkWrite(operations);
+      console.log("Rastrelliere data successfully inserted/updated.");
+    } else {
+      console.log("No valid Rastrelliere features to process.");
+    }
   } catch (error) {
     console.error("Error in fetchAndRefreshRastrelliere:", error);
   }

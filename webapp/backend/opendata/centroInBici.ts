@@ -5,6 +5,7 @@ const decompress = require("decompress");
 import { Response } from "express";
 import mongoose from "mongoose";
 import entityModel from "../model/entity.model";
+import crypto from "crypto";
 
 const file = fs.createWriteStream("dist/opendata/centroinbici.zip");
 
@@ -47,53 +48,45 @@ export const fetchAndRefreshCentroInBici = async (jsonData: string): Promise<voi
       throw new Error("Invalid JSON format: 'features' array missing.");
     }
 
-    // Extract and transform data
-    const entities = data.features.map((feature: any) => {
-      const { fumetto, desc, cicloposteggi } = feature.properties;
-      const { coordinates } = feature.geometry;
+    const operations = data.features
+      .map((feature: any) => {
+        const { fumetto, desc, cicloposteggi } = feature.properties;
+        const { coordinates } = feature.geometry;
 
-      if (!fumetto || !desc || !cicloposteggi || !coordinates) {
-        throw new Error("Invalid JSON structure: Missing required fields.");
-      }
+        if (!fumetto || !desc || !cicloposteggi || !coordinates) {
+          console.log("Invalid feature:", feature);
+          return null;
+        }
 
-      return {
-        eid: fumetto.toString(),
-        name: desc,
-        description: `Cicloposteggi: ${cicloposteggi}`,
-        geolocation: JSON.stringify(coordinates),
-        type: "centroInBici",
-        rating: 0,
-        reviews: [],
-        feedbacks: [],
-      };
-    });
+        const eid = crypto.createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
 
-    // Refresh database
-    const existingEntities = await entityModel.find({ type: "centroInBici" }).exec();
+        return {
+          updateOne: {
+            filter: { eid }, // Match by hashed `eid`
+            update: {
+              eid,
+              name: desc,
+              description: `Cicloposteggi: ${cicloposteggi}`,
+              geolocation: JSON.stringify(coordinates),
+              type: "centroInBici",
+              rating: 0,
+              reviews: 0,
+              feedbacks: [],
+            },
+            upsert: true, // Insert if not found
+          },
+        };
+      })
+      .filter((op:any): op is Exclude<typeof op, null> => op !== null); // Filter out null operations
 
-    // Find entities to delete
-    const incomingIds = entities.map((entity:any) => entity.eid);
-    const toDelete = existingEntities.filter(
-      (existing) => !incomingIds.includes(existing.eid)
-    );
-
-    // Delete outdated entities
-    await Promise.all(toDelete.map((entity) => entityModel.deleteOne({ eid: entity.eid })));
-
-    // Upsert new/updated entities
-    await Promise.all(
-      entities.map((entity:any) =>
-        entityModel.updateOne(
-          { eid: entity.eid },
-          { $set: entity },
-          { upsert: true } // Insert if not exists
-        )
-      )
-    );
-
-    console.log("Centro in Bici entities refreshed successfully.");
+    if (operations.length > 0) {
+      await entityModel.bulkWrite(operations);
+      console.log("Centro in Bici data successfully inserted/updated.");
+    } else {
+      console.log("No valid Centro in Bici features to process.");
+    }
   } catch (error) {
-    console.error("Error refreshing centro in bici:", error);
+    console.error("Error in fetchAndRefreshCentroInBici:", error);
   }
 };
 

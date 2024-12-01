@@ -45,6 +45,8 @@ let itinerari: any;
 let piste_ciclabili: any;
 let ready: boolean = false;
 
+const UPDATEFLAG:boolean = false; // SET TO TRUE BEFORE RECOMPILING TO UPDATE ALL DATABASE RECORDS
+
 // Run the main function
 async function main() {
   try {
@@ -52,65 +54,67 @@ async function main() {
     await mongoose.connect("mongodb+srv://riccardofinello:0PgsKP2ACrYJsVSz@infobikecluster.dilv1.mongodb.net/InfoBikeDB");
     console.log("Connected to MongoDB.");
 
-    // Attempt to fetch data from external sources
-    console.log("Fetching data from external sources...");
-    try {
-      centro_in_bici = await getCentroInBici;
-      parcheggio_protetto = await getParcheggioProtetto;
-      rastrelliere = await getRastrelliere;
-      piste_ciclabili = await getPisteCiclabili;
-    } catch (err) {
-      console.log("Error fetching data from external sources, falling back to local files.", err);
-    }
-
-    // Fallback to reading data from local files if necessary
-    console.log("Loading fallback data from local files...");
-
-    if (!centro_in_bici) {
+    
+    if(UPDATEFLAG){
+      console.log("Fetching data from external sources...");
+      try {
+        centro_in_bici = await getCentroInBici;
+        parcheggio_protetto = await getParcheggioProtetto;
+        rastrelliere = await getRastrelliere;
+        piste_ciclabili = await getPisteCiclabili;
+      } catch (err) {
+        console.log("Error fetching data from external sources", err);
+      }
+      
+      
+        
       try {
         const data = await fs.readFile('dist/opendata/centro_in_bici.geojson', { encoding: 'utf8' });
         centro_in_bici = JSON.parse(data);
-        await fetchAndRefreshCentroInBici(centro_in_bici);
+        
+        await fetchAndRefreshCentroInBici(data);
         console.log("Centro in Bici data loaded from file.");
       } catch (err) {
         console.log("Error loading centro_in_bici from file:", err);
       }
-    }
+    
 
-    if (!parcheggio_protetto) {
+    
       try {
         const data = await fs.readFile('dist/opendata/parcheggio_protetto_bike.geojson', { encoding: 'utf8' });
         parcheggio_protetto = JSON.parse(data);
-        await fetchAndRefreshParcheggioProtetto(parcheggio_protetto);
+        await fetchAndRefreshParcheggioProtetto(data);
         console.log("Parcheggio Protetto data loaded from file.");
       } catch (err) {
         console.log("Error loading parcheggio_protetto from file:", err);
       }
-    }
+    
 
-    if (!rastrelliere) {
+    
       try {
         const data = await fs.readFile('dist/opendata/rastrelliere.geojson', { encoding: 'utf8' });
         rastrelliere = JSON.parse(data);
-        await fetchAndRefreshRastrelliere(rastrelliere);
+        await fetchAndRefreshRastrelliere(data);
         console.log("Rastrelliere data loaded from file.");
       } catch (err) {
         console.log("Error loading rastrelliere from file:", err);
       }
-    }
+    
 
-    if (!piste_ciclabili) {
+    
       try {
         const data = await fs.readFile('dist/opendata/piste_ciclabili.geojson', { encoding: 'utf8' });
         piste_ciclabili = JSON.parse(data);
-        await fetchAndRefreshPisteCiclabili(piste_ciclabili);
+        await fetchAndRefreshPisteCiclabili(data);
         console.log("Piste Ciclabili data loaded from file.");
       } catch (err) {
         console.log("Error loading piste_ciclabili from file:", err);
       }
-    }
+      
 
-    console.log("Data fetching and processing complete.");
+      console.log("Data fetching and processing complete.");
+    }
+    
 
     // Start the server after all initialization is complete
     ready = true;

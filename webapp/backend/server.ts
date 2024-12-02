@@ -7,15 +7,23 @@ import { tokenChecker } from "./auth/tokenChecker";
 import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
 import { getReviewsByEntityId } from "./dataControllers/getReviews";
 import { postFeedback } from "./dataControllers/postFeedback";
+
 import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
-import getCentroInBici from "./opendata/centroInBici";
-import getParcheggioProtetto from "./opendata/parcheggioprotetto";
-import getPisteCiclabili from "./opendata/pisteciclabili";
-import getRastrelliere from "./opendata/rastrelliere";
+import getOpenDataCentroInBici from "./opendata/centroInBici";
+import getOpenDataParcheggioProtetto from "./opendata/parcheggioprotetto";
+import getOpenDataPisteCiclabili from "./opendata/pisteciclabili";
+import getOpenDataRastrelliere from "./opendata/rastrelliere";
+
 import { fetchAndRefreshRastrelliere } from "./opendata/rastrelliere";
 import { fetchAndRefreshParcheggioProtetto } from "./opendata/parcheggioprotetto";
 import { fetchAndRefreshCentroInBici } from "./opendata/centroInBici";
 import { fetchAndRefreshPisteCiclabili } from "./opendata/pisteciclabili";
+
+import  getRastrelliere from "./dataControllers/getRastrelliere";
+import getCentroInBici from "./dataControllers/getCentroInBici";
+import getPisteCiclabili from "./dataControllers/getPisteCiclabili";
+import getParcheggiProtetti from "./dataControllers/getParcheggiProtetti";
+
 const fs = require('node:fs/promises');
 
 dotenv.config();
@@ -58,10 +66,10 @@ async function main() {
     if(UPDATEFLAG){
       console.log("Fetching data from external sources...");
       try {
-        centro_in_bici = await getCentroInBici;
-        parcheggio_protetto = await getParcheggioProtetto;
-        rastrelliere = await getRastrelliere;
-        piste_ciclabili = await getPisteCiclabili;
+        centro_in_bici = await getOpenDataCentroInBici;
+        parcheggio_protetto = await getOpenDataParcheggioProtetto;
+        rastrelliere = await getOpenDataRastrelliere;
+        piste_ciclabili = await getOpenDataPisteCiclabili;
       } catch (err) {
         console.log("Error fetching data from external sources", err);
       }
@@ -141,5 +149,11 @@ app.post("/auth", authenticateUser);
 app.post("/auth/google", signInWithGoogle);
 app.post("/register/google", signInWithGoogle);
 app.post("/register", registerUser);
+
 app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
 app.post("/feedbacks/:eid", tokenChecker, postFeedback);
+
+app.get("/rastrelliere", getRastrelliere);
+app.get("/pisteCiclabili", getPisteCiclabili);
+app.get("/centroInBici", getCentroInBici);
+app.get("/parcheggiProtetti",getParcheggiProtetti)

@@ -10,7 +10,7 @@ const decompress = require("decompress");
 
 const file = fs.createWriteStream("dist/opendata/pisteciclabili.zip");
 
-async function getPisteCiclabili() {
+async function getOpenDataPisteCiclabili() {
   return new Promise((resolve: Function, reject: Function) => {
     https.get(
       "https://gis.comune.trento.it/dbexport?db=base&sc=mobilita&ly=piste_ciclabili&fr=geojson",
@@ -104,4 +104,4 @@ export const fetchAndRefreshPisteCiclabili = async (jsonData: string): Promise<v
   }
 };
 
-export default getPisteCiclabili();
+export default getOpenDataPisteCiclabili();

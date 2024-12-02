@@ -10,7 +10,7 @@ import crypto from "crypto";
 const file = fs.createWriteStream("dist/opendata/centroinbici.zip");
 
 
-async function getCentroInBici() {
+async function getOpenDataCentroInBici() {
   return new Promise((resolve :Function, reject : Function) => {
     https.get(
       "https://gis.comune.trento.it/dbexport?db=base&sc=mobilita&ly=centro_in_bici&fr=geojson",
@@ -90,4 +90,4 @@ export const fetchAndRefreshCentroInBici = async (jsonData: string): Promise<voi
   }
 };
 
-export default getCentroInBici();
+export default getOpenDataCentroInBici();

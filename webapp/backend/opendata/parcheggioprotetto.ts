@@ -11,7 +11,7 @@ import entityModel from "../model/entity.model";
 const file = fs.createWriteStream("dist/opendata/parcheggioprotetto.zip");
 
 
-async function getParcheggioProtetto() {
+async function getOpenDataParcheggioProtetto() {
   return new Promise((resolve :Function, reject : Function) => {
     https.get(
       "https://gis.comune.trento.it/dbexport?db=base&sc=mobilita&ly=parcheggio_protetto_bike&fr=geojson",
@@ -102,4 +102,4 @@ export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promi
   }
 };
 
-export default getParcheggioProtetto();
+export default getOpenDataParcheggioProtetto();

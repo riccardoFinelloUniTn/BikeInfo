@@ -9,7 +9,7 @@ import crypto from "crypto";
 
 const file = fs.createWriteStream("dist/opendata/rastrelliere.zip");
 
-async function getRastrelliere() {
+async function getOpenDataRastrelliere() {
   return new Promise((resolve: Function, reject: Function) => {
     https.get(
       "https://gis.comune.trento.it/dbexport?db=base&sc=mobilita&ly=rastrelliere&fr=geojson",
@@ -94,4 +94,4 @@ export const fetchAndRefreshRastrelliere = async (jsonData: string): Promise<voi
 };
 
 
-export default getRastrelliere();
+export default getOpenDataRastrelliere();

@@ -4,9 +4,12 @@
             :pages="pages" 
             :activePage="activePage" 
             :nav-link-click="async (index: number) => {
-                // activePage = index;
-                $router.push(pages[index].link.url);
-                index == 1 ? await panToUser() : null;
+                if (index == 1 && !showMap) {
+                    $router.push('/serverError');
+                } else {
+                    $router.push(pages[index].link.url);
+                    index == 1 ? await panToUser() : null;
+                }
             }">
         </navbar>
 
@@ -14,8 +17,12 @@
             <RouterView
                 v-if="activePage == 0" 
                 :go-to-map="async () => {
-                    await panToUser();
-                    $router.push(pages[1].link.url);
+                    if (showMap){
+                        await panToUser();
+                        $router.push(pages[1].link.url);
+                    } else {
+                        $router.push('/serverError');
+                    }
                 }"
             ></RouterView>
             <RouterView
@@ -62,8 +69,8 @@ export default {
         RegLogController,
     },
     data() {
-
         return {
+            showMap: true,
             rangeError: 0,
             userLatLng: {
                 lat: 0,
@@ -91,13 +98,10 @@ export default {
         }
     },
     async mounted() {
-        try {
-            this.rastrelliere = await this.getRastrelliere();
-        } catch (error) {
-            console.error("Failed to fetch rastrelliere:", error);
-            if ((error as any).message.includes("500")) {
-                this.activePage = 0; // Stay on the current page if server error occurs
-            }
+        this.rastrelliere = await this.getRastrelliere();
+        if ((this.rastrelliere as any) == "false") {
+            this.showMap = false;
+            console.log("Error in the API call.");
         }
     },
 
@@ -140,7 +144,7 @@ export default {
                 let data = await response.json();
                 return data;
             } catch (error) {
-                return "ERROR: " + JSON.stringify(error);
+                return "false";
             }
         }
     }

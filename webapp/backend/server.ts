@@ -53,7 +53,7 @@ let itinerari: any;
 let piste_ciclabili: any;
 let ready: boolean = false;
 
-const UPDATEFLAG:boolean = false; // SET TO TRUE BEFORE RECOMPILING TO UPDATE ALL DATABASE RECORDS
+const UPDATEFLAG:boolean = true; // SET TO TRUE BEFORE RECOMPILING TO UPDATE ALL DATABASE RECORDS
 
 // Run the main function
 async function main() {

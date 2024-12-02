@@ -61,11 +61,11 @@ export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promi
     }
 
     const operations = data.features
-      .map((feature: GeoJSONFeature) => {
-        const { zona, tipologia } = feature.properties;
+      .map((feature: any) => {
+        const { park, via, fumetto, posti, layer } = feature.properties;
         const { coordinates } = feature.geometry;
 
-        if (!zona || !tipologia || !coordinates) {
+        if (!park || !via || !fumetto || !posti || !coordinates) {
           console.log("Missing fields in feature:", feature);
           return null;
         }
@@ -77,12 +77,11 @@ export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promi
             filter: { eid }, // Match by hashed `eid`
             update: {
               eid,
-              name: zona,
-              description: tipologia,
+              name: park,
+              description: `${fumetto} - ${layer}`,
               geolocation: JSON.stringify(coordinates),
               type: "parcheggioProtetto",
               rating: 0,
-              //reviews: 0,
               feedbacks: [],
             },
             upsert: true, // Insert if not found

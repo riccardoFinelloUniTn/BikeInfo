@@ -7,7 +7,7 @@ import { Response } from "express";
 const file = fs.createWriteStream("dist/opendata/bikesharing.zip");
 
 
-async function getBikeSharingTrento() {
+async function getOpenDataBikeSharingTrento() {
   return new Promise((resolve :Function, reject : Function) => {
     https.get(
       "https://os.smartcommunitylab.it/core.mobility/bikesharing/trento",
@@ -37,6 +37,6 @@ async function getBikeSharingTrento() {
   });
 }
   
-export default getBikeSharingTrento();
+export default getOpenDataBikeSharingTrento();
 
 

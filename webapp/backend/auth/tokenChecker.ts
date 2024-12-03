@@ -4,24 +4,31 @@ import jwt from "jsonwebtoken";
 
 dotenv.config();
 
+interface DecodedToken {
+  email: string;
+  name: string;
+}
+
 export const tokenChecker = (req: Request, res: Response, next: NextFunction): void => {
-  if (!req) {
-    return;
-  }
+  const authHeader = req.headers.authorization;
 
-  // Check header or URL parameters or post parameters for token
-  const token = req.headers["authorization"]?.split(" ")[1]; // Extract token from Bearer scheme
-
-  // If there is no token
-  if (!token) {
+  if (!authHeader) {
     res.status(401).json({
       success: false,
-      message: "No token provided.",
+      message: "Authorization token is missing.",
     });
     return;
   }
 
-  // Decode token, verify secret, and check expiration
+  const token = authHeader.split(" ")[1]; // Extract token from Bearer scheme
+  if (!token) {
+    res.status(401).json({
+      success: false,
+      message: "Invalid token format.",
+    });
+    return;
+  }
+
   jwt.verify(token, process.env.SUPER_SECRET!, (err, decoded) => {
     if (err) {
       res.status(403).json({
@@ -31,8 +38,10 @@ export const tokenChecker = (req: Request, res: Response, next: NextFunction): v
       return;
     }
 
-    // If everything is good, attach the decoded token to the request object
-    req.headers["loggedUser"] = decoded as string; // Decoded payload (ensure type safety if needed)
+    // Attach decoded payload (e.g., email and name) to the request object
+    const { email, name } = decoded as DecodedToken; // Explicit type cast
+    req.headers["loggedUser"] = JSON.stringify({ email, name }); // Store as JSON string
+
     next();
   });
 };

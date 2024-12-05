@@ -8,6 +8,8 @@ import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
 import { getReviewsByEntityId } from "./dataControllers/getReviews";
 import { postFeedback } from "./dataControllers/postFeedback";
 import { postReview } from "./dataControllers/postReview";
+import { patchReview } from "./dataControllers/patchReview";
+import { deleteReview } from "./dataControllers/deleteReview";
 
 import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
 import getOpenDataCentroInBici from "./opendata/centroInBici";
@@ -156,6 +158,8 @@ app.post("/feedbacks/:eid", tokenChecker, postFeedback);
 
 app.get("/reviews/:eid", getReviewsByEntityId);
 app.post("/reviews/:eid", tokenChecker, postReview);
+app.patch("/reviews/:eid", tokenChecker, patchReview);
+app.delete("/reviews/:eid", tokenChecker, deleteReview);
 
 app.get("/rastrelliere", getRastrelliere);
 app.get("/pisteCiclabili", getPisteCiclabili);

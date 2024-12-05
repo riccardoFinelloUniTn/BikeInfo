@@ -41,7 +41,7 @@ export const tokenChecker = (req: Request, res: Response, next: NextFunction): v
     // Attach decoded payload (e.g., email and name) to the request object
     const { email, name } = decoded as DecodedToken; // Explicit type cast
     req.headers["loggedUser"] = JSON.stringify({ email, name }); // Store as JSON string
-
+    
     next();
   });
 };

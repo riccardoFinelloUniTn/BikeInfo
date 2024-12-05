@@ -7,6 +7,7 @@ import { tokenChecker } from "./auth/tokenChecker";
 import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
 import { getReviewsByEntityId } from "./dataControllers/getReviews";
 import { postFeedback } from "./dataControllers/postFeedback";
+import { postReview } from "./dataControllers/postReview";
 
 import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
 import getOpenDataCentroInBici from "./opendata/centroInBici";
@@ -53,7 +54,7 @@ let itinerari: any;
 let piste_ciclabili: any;
 let ready: boolean = false;
 
-const UPDATEFLAG:boolean = true; // SET TO TRUE BEFORE RECOMPILING TO UPDATE ALL DATABASE RECORDS
+const UPDATEFLAG:boolean = false; // SET TO TRUE BEFORE RECOMPILING TO UPDATE ALL DATABASE RECORDS
 
 // Run the main function
 async function main() {
@@ -153,7 +154,12 @@ app.post("/register", registerUser);
 app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
 app.post("/feedbacks/:eid", tokenChecker, postFeedback);
 
+app.get("/reviews/:eid", getReviewsByEntityId);
+app.post("/reviews/:eid", tokenChecker, postReview);
+
 app.get("/rastrelliere", getRastrelliere);
 app.get("/pisteCiclabili", getPisteCiclabili);
 app.get("/centroInBici", getCentroInBici);
-app.get("/parcheggiProtetti",getParcheggiProtetti)
+app.get("/parcheggiProtetti",getParcheggiProtetti);
+
+

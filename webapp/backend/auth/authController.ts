@@ -42,7 +42,11 @@ function verifyPassword(enteredPassword: string, salt: string, hash: string): bo
     }
 
     // Generate JWT token
-    const token = jwt.sign({ email: user.email }, process.env.SUPER_SECRET!, { expiresIn: 86400 });
+    const token = jwt.sign(
+      { email: user.email, name: user.name + " " + user.surname },
+      process.env.SUPER_SECRET!,
+      { expiresIn: 86400 } // Token validity (24 hours)
+    );
 
 
 

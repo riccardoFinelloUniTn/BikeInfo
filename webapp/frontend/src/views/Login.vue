@@ -45,7 +45,7 @@
                         <div>
                             <label for="email" class="block text-sm mb-2 dark:text-white">Email address</label>
                             <div class="relative">
-                                <input type="email" id="email" name="email"
+                                <input type="email" id="email" name="email" autocomplete="email"
                                     class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                                     required aria-describedby="email-error">
                                 <div class="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
@@ -69,7 +69,7 @@
                                     href="../examples/html/recover-account.html">Forgot password?</a> -->
                             </div>
                             <div class="relative">
-                                <input type="password" id="password" name="password"
+                                <input type="password" id="password" name="password" autocomplete="current-password"
                                     class="py-3 px-4 block w-full border-gray-200 rounded-lg text-sm focus:border-blue-500 focus:ring-blue-500 disabled:opacity-50 disabled:pointer-events-none dark:bg-neutral-900 dark:border-neutral-700 dark:text-neutral-400 dark:placeholder-neutral-500 dark:focus:ring-neutral-600"
                                     required aria-describedby="password-error">
                                 <div class="hidden absolute inset-y-0 end-0 pointer-events-none pe-3">
@@ -87,7 +87,7 @@
                         <!-- Checkbox -->
                         <div class="flex items-center">
                             <div class="flex">
-                                <input id="remember-me" name="remember-me" type="checkbox"
+                                <input id="remember-me" name="remember-me" type="checkbox" autocomplete="on"
                                     class="shrink-0 mt-0.5 border-gray-200 rounded text-blue-600 focus:ring-blue-500 dark:bg-neutral-800 dark:border-neutral-700 dark:checked:bg-blue-500 dark:checked:border-blue-500 dark:focus:ring-offset-gray-800">
                             </div>
                             <div class="ms-3">
@@ -113,16 +113,20 @@
 
 <script lang="ts">
 
+import { useGlobalStore } from '@/globalStore';
 
 export default {
     name: 'Login',
 
-    props: ['loginOrRegister', 'globalLogin'],
+    setup(){
+        const globalStore = useGlobalStore();
+
+        return { globalStore };
+    },
 
     data(){
 
         return {
-            isLoginPage: true,
             errorMsg: ''
         }
     },
@@ -151,8 +155,8 @@ export default {
                 remember = true;
             }
             
-            let response = await this.globalLogin(email.value, password.value, remember);
-
+            const response = await this.globalStore.login(email.value, password.value, remember);
+            console.log(response);
             if (response.success) {
                 this.errorMsg = '';
             } else {
@@ -161,7 +165,7 @@ export default {
             
             if (this.errorMsg === '') {
                 document.getElementById('login-error')!.classList.add('hidden');
-                this.$router.push('/');
+                this.$router.push('/index');
             } else {
                 document.getElementById('login-error')!.classList.remove('hidden');
             }

@@ -72,7 +72,7 @@ export const fetchAndRefreshPisteCiclabili = async (jsonData: string): Promise<v
           return null;
         }
 
-        const eid = crypto.createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
+        const eid = crypto.createHash("md5").update(JSON.stringify(coordinates)).digest("hex");
 
         return {
           updateOne: {
@@ -81,11 +81,11 @@ export const fetchAndRefreshPisteCiclabili = async (jsonData: string): Promise<v
               eid,
               name: descrizione,
               description: tipologia,
-              geolocation: JSON.stringify(coordinates),
+              geolocation: coordinates,
               type: "pistaCiclabile",
               rating: 0,
               //reviews: 0,
-              feedbacks: [],
+              //feedbacks: [],
             },
             upsert: true, // Insert if no document matches the `filter`
           },

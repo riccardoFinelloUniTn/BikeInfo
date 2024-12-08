@@ -58,7 +58,7 @@ export const fetchAndRefreshCentroInBici = async (jsonData: string): Promise<voi
           return null;
         }
 
-        const eid = crypto.createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
+        const eid = crypto.createHash("md5").update(JSON.stringify(coordinates)).digest("hex");
 
         return {
           updateOne: {
@@ -67,11 +67,11 @@ export const fetchAndRefreshCentroInBici = async (jsonData: string): Promise<voi
               eid,
               name: desc,
               description: `Cicloposteggi: ${cicloposteggi}`,
-              geolocation: JSON.stringify(coordinates),
+              geolocation: coordinates,
               type: "centroInBici",
               rating: 0,
               reviews: 0,
-              feedbacks: [],
+              //feedbacks: [],
             },
             upsert: true, // Insert if not found
           },

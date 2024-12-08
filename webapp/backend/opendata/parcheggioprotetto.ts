@@ -70,7 +70,7 @@ export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promi
           return null;
         }
 
-        const eid = crypto.createHash("sha256").update(JSON.stringify(coordinates)).digest("hex");
+        const eid = crypto.createHash("md5").update(JSON.stringify(coordinates)).digest("hex");
 
         return {
           updateOne: {
@@ -79,10 +79,10 @@ export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promi
               eid,
               name: park,
               description: `${fumetto} - ${layer}`,
-              geolocation: JSON.stringify(coordinates),
+              geolocation: coordinates,
               type: "parcheggioProtetto",
               rating: 0,
-              feedbacks: [],
+              //feedbacks: [],
             },
             upsert: true, // Insert if not found
           },

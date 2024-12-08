@@ -6,21 +6,21 @@ export interface IEntity extends Document {  // Add "export" here
   name: string;
   description: string;
   geolocation: string;
-  type: string;
+  type: [[number]];
   rating: number;
   //reviews: number;
-  feedbacks: mongoose.Types.ObjectId[]; // References to Feedback model
+  //feedbacks: mongoose.Types.ObjectId[]; 
 }
 
 const entitySchema: Schema = new mongoose.Schema({
   eid: { type: String, required: true, unique: true },
   name: { type: String, required: true },
   description: { type: String, required: true },
-  geolocation: { type: String, required: true },
+  geolocation: { type: [[Number]], required: true },
   type: { type: String, required: true },
   rating: { type: Number, required: true },
   //reviews: { type: Number, required: true},
-  feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }],
+  //feedbacks: [{ type: mongoose.Schema.Types.ObjectId, ref: 'Feedback' }],
 });
 
 // Export the Entity model with IEntity type

@@ -1,6 +1,6 @@
 // controllers/reviewController.ts
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import reviewModel from "../model/review.model";
+import reviewModel from "../../model/review.model";
 
 // Handler function to fetch reviews by entity ID
 export const getReviewsByEntityId: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {

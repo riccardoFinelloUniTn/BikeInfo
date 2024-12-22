@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import feedbackModel from "../model/review.model";
+import feedbackModel from "../../model/review.model";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
 

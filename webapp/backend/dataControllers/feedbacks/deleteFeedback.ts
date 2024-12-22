@@ -6,43 +6,66 @@ import dotenv from "dotenv";
 dotenv.config();
 
 export const deleteFeedback: RequestHandler = async (
-    req: Request,
-    res: Response,
-    next: NextFunction
+  req: Request,
+  res: Response,
+  next: NextFunction
 ): Promise<void> => {
-    try {
-      const { eid } = req.params;
-  
-      const loggedUser = req.headers.loggedUser as string;
-      if (!loggedUser) {
-        res.status(401).json({ success: false, message: "Unauthorized. User not logged in." });
-        return;
-      }
-  
-      const { email: uEmail } = JSON.parse(loggedUser);
-  
-      // Find and delete the feedback
-      const deletedFeedback = await feedbackModel.findOneAndDelete({ entityId: eid, uEmail }).exec();
-  
-      if (!deletedFeedback) {
-        res.status(404).json({
-          success: false,
-          message: "Review not found for this entity by the logged-in user.",
-        });
-        return;
-      }
-      
-      //success
-      res.status(200).json({
-        success: true,
-        message: "Feedback deleted successfully.",
-        deleteFeedback,
-      });
-    } catch (error) {
-      console.error("Error deleting feedback:", error);
-      res.status(500).json({
-        success: false,
-        message: "An error occurred while deleting the feedback.",
-      });
+  try {
+    const authHeader = req.headers.authorization;
+    if (!authHeader) {
+      res.status(401).json({ success: false, message: "Authorization token is missing." });
+      return;
     }
-  };
+
+    const token = authHeader.split(" ")[1];
+    if (!token) {
+      res.status(401).json({ success: false, message: "Invalid token format." });
+      return;
+    }
+
+    // Verify the token
+    const secretKey = process.env.SUPER_SECRET!;
+    let decoded: any;
+
+    try {
+      decoded = jwt.verify(token, secretKey);
+    } catch (error) {
+      res.status(403).json({ success: false, message: "Failed to authenticate token." });
+      return;
+    }
+
+    const uEmail = decoded.email;
+
+    const { fid } = req.params;
+
+    if (!fid) {
+      res.status(400).json({ success: false, message: "Feedback ID is required." });
+      return;
+    }
+
+    const feedback = await feedbackModel.findOne({ fid }).exec();
+
+    if (!feedback) {
+      res.status(404).json({ success: false, message: "Feedback not found." });
+      return;
+    }
+
+    if (feedback.uEmail !== uEmail) {
+      res.status(403).json({ success: false, message: "Unauthorized to delete this feedback." });
+      return;
+    }
+
+    await feedbackModel.deleteOne({ fid }).exec();
+
+    res.status(200).json({
+      success: true,
+      message: "Feedback deleted successfully.",
+    });
+  } catch (error) {
+    console.error("Error deleting feedback:", error);
+    res.status(500).json({
+      success: false,
+      message: "An error occurred while deleting feedback.",
+    });
+  }
+};

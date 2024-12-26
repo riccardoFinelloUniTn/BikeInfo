@@ -114,12 +114,18 @@
 <script lang="ts">
 
 import { useGlobalStore } from '@/globalStore';
+import { onMounted } from 'vue';
 
 export default {
     name: 'Login',
 
     setup(){
         const globalStore = useGlobalStore();
+
+    onMounted(() => {
+        globalStore.updateUserPos();
+        globalStore.activePage = 2;
+    });
 
         return { globalStore };
     },

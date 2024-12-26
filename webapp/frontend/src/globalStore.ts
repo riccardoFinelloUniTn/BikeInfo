@@ -8,6 +8,7 @@ export const useGlobalStore = defineStore('global', {
             lat: 0,
             lng: 0,
         },
+        showEntityCard: false,
 
         isLoggedIn: false,
 
@@ -163,7 +164,7 @@ export const useGlobalStore = defineStore('global', {
                         sessionStorage.setItem("token", data.token); // session only
                     }
                     this.isLoggedIn = true;
-                    console.log(data);
+                    this.updatePages();
                     return data;
                 } else {
                     this.isLoggedIn = false;
@@ -174,6 +175,55 @@ export const useGlobalStore = defineStore('global', {
                 console.log("ERROR: " + JSON.stringify(error));
                 return { success: false, message: "Error in the login process." };
             }
-        }
+        },
+
+        checkIfLoggedIn(): void {
+            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+            if (token) {
+                this.isLoggedIn = true;
+            } else {
+                this.isLoggedIn = false;
+            }
+        },
+
+        updatePages(): void {
+            if (this.isLoggedIn) {
+                this.pages = [
+                    {
+                        link: { text: 'Home', url: '/index' },
+                        pageTitle: 'Home Page',
+                        content: 'This is the home page.',
+                    },
+                    {
+                        link: { text: 'Map', url: '/map' },
+                        pageTitle: 'Map Page',
+                        content: 'This is the map page.',
+                    },
+                    {
+                        link: { text: 'Profile', url: '/profile' },
+                        pageTitle: 'Profile Page',
+                        content: 'This is the profile page.',
+                    },
+                ];
+            } else {
+                this.pages = [
+                    {
+                        link: { text: 'Home', url: '/index' },
+                        pageTitle: 'Home Page',
+                        content: 'This is the home page.',
+                    },
+                    {
+                        link: { text: 'Map', url: '/map' },
+                        pageTitle: 'Map Page',
+                        content: 'This is the map page.',
+                    },
+                    {
+                        link: { text: 'Login/Register', url: '/login' },
+                        pageTitle: 'Login Page',
+                        content: 'This is the login page.',
+                    },
+                ];
+            }
+        },
     }
 })

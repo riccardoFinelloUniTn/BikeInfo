@@ -1,6 +1,6 @@
 <template>
     <!-- Hero -->
-    <div class="pt-10 bg-gradient-to-b from-violet-600/10 via-transparent">
+    <div class="pt-10 bg-gradient-to-b from-violet-600/10 via-transparent" style=" background-image: url('../assets/index_bg.jpg')">
         <div class="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-8">
             <!-- Announcement Banner -->
             <!-- <div class="flex justify-center">
@@ -17,14 +17,18 @@
 
             <!-- Title -->
             <div class="max-w-3xl text-center mx-auto">
-            <h1 class="block font-medium text-gray-200 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
-                Ottimizza i tuoi spostamenti a Trento
-            </h1>
+                <h1 class="block font-medium text-gray-200 text-4xl sm:text-5xl md:text-6xl lg:text-7xl">
+                    Ottimizza i tuoi spostamenti a Trento
+                </h1>
             </div>
             <!-- End Title -->
 
             <div class="max-w-3xl text-center mx-auto">
-            <p class="text-lg text-white/70">InfoBike è un progetto sviluppato da Francesco Fanton, Matteo Ballardin e Riccardo Finello durante il corso di Ingegneria del software presso l'Università di Trento.</p>
+                <p class="text-lg text-white/70">InfoBike è un progetto sviluppato da Francesco Fanton, Matteo Ballardin e Riccardo Finello durante il corso di Ingegneria del software presso l'Università di Trento.</p>
+            </div>
+
+            <div class="max-w-3xl text-center mx-auto">
+                <p class="text-lg text-white/70">Si consiglia di utilizzare la mappa in modalità schermo intero per un'esperienza migliore</p>
             </div>
 
             <!-- Buttons -->

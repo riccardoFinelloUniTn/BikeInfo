@@ -2,8 +2,8 @@
     <div class="h-full w-full">
         <navbar 
             :pages="globalStore.pages" 
-            :activePage="globalStore.activePage" 
-            :nav-link-click="navLinkClick">
+            :activePage="globalStore.activePage"
+        >
         </navbar>
 
         <router-view></router-view>
@@ -63,6 +63,10 @@ export default {
         });
 
         const globalStore = useGlobalStore();
+
+        globalStore.checkIfLoggedIn();
+        globalStore.updatePages();
+
         return { globalStore };
     },
     // computed: {
@@ -131,19 +135,7 @@ export default {
 
     methods: {
 
-        async navLinkClick(index: number) {
-            if (index == 1 && !this.globalStore.$state.showMap) {
-                this.$router.push('/serverError');
-            } else {
-                console.log(index);
-                if (index == 1) {
-                    await this.globalStore.getUserPos();
-                }
-                this.globalStore.activePage = index;
-                console.log(this.globalStore.userLatLng);
-                this.$router.push(this.globalStore.pages[index].link.url);
-            }
-        }
+        
         // panToUser(): Promise<GeolocationPosition> {
         //     return new Promise((resolve, reject) => {
         //         navigator.geolocation.getCurrentPosition(

@@ -18,9 +18,10 @@
     >
       <MarkerCluster>
         <AdvancedMarker
-          v-for="(location, i) in locations"
+          v-for="(element, i) in locations"
           :key="i"
-          :options="{ position: location }"
+          @click="showEntityInfo(i)"
+          :options="{ position: element.geolocation[0], gmpClickable: true }"
         />
       </MarkerCluster>
 
@@ -51,7 +52,7 @@
         class="mb-3.5 mr-1.5 ml-1.5"
       >
         <button
-          class="p-2 rounded shadow-sm shadow-black/30 text-black bg-white" 
+          class="p-2 rounded shadow-sm shadow-black/30 text-black bg-white hover:bg-gray-200" 
           @click="loadRacks()"
         >
           <img src="../assets/rack.png" alt="Rastrelliere" class="w-6 h-6">
@@ -62,13 +63,23 @@
         class="mb-3.5 mr-1.5 ml-1.5"
       >
         <button
-          class="p-2 rounded shadow-sm shadow-black/30 text-black bg-white" 
+          class="p-2 rounded shadow-sm shadow-black/30 text-black bg-white hover:bg-gray-200" 
           @click="loadParkings()"
         >
           <img src="../assets/parking.png" alt="Rastrelliere" class="w-6 h-6">
         </button> 
       </CustomControl>
     </GoogleMap>
+
+
+
+    <entity-info 
+      v-if="globalStore.showEntityCard"
+      :entity-to-show="entity"
+      :reviews-to-show="reviews"
+    ></entity-info>
+
+    
   </div>
 </template>
 
@@ -78,6 +89,7 @@
   const API_KEY = import.meta.env.VITE_GOOGLE_MAPS_API_KEY;
   import proj4 from 'proj4';
   import { useGlobalStore } from "@/globalStore";
+  import EntityInfo from "@/components/EntityInfo.vue";
 
 
   // Sistema di partenza (EPSG:25832)
@@ -95,10 +107,13 @@
 
       onMounted(() => {
         globalStore.updateUserPos();
+        globalStore.activePage = 1;
+        globalStore.showEntityCard = false;
       });
 
       onUnmounted(() => {
         globalStore.clearWatch();
+        globalStore.showEntityCard = false;
       });
 
       return { globalStore };
@@ -108,7 +123,7 @@
     //   window.addEventListener('beforeunload', this.onRefresh);
     // },
 
-    components: { GoogleMap, AdvancedMarker, MarkerCluster, InfoWindow, CustomControl, Circle },
+    components: { GoogleMap, AdvancedMarker, MarkerCluster, InfoWindow, CustomControl, Circle, EntityInfo },
 
     // mounted() {
     //   this.updateUserLoc();
@@ -124,12 +139,13 @@
     
     data() {
       const globalStore = useGlobalStore();
-      const locations: Array<{lat: number, lng: number}> = [];
+      const locations: any = [];
       const zoom = 18;
       const center = globalStore.$state.userLatLng;
       const userCircleRadius = this.calculateRadius(zoom);
 
-      this.updateMarkers();
+      const entity: {description: string, eid: string, geolocation: [], name: string, rating: number, type: string} = {description: "", eid: "", geolocation: [], name: "", rating: 0, type: ""};
+      const reviews: {owner: string, desc: string}[] = [];
       // const rast = Object.assign({}, this.rastLocs);
       // const updatedRangeError = this.rangeError;
       // const updatedUsrLatLang = this.userLatLng;
@@ -217,16 +233,53 @@
       //   },
       // ];
     
-      return { API_KEY, locations, zoom, userCircleRadius, center };
+      return { API_KEY, locations, zoom, userCircleRadius, center, entity, reviews };
       // return { center, API_KEY, locations, zoom, updatedRangeError, userCircleRadius, updatedUsrLatLang};
     },
 
 
-
     methods: {
 
+      async getReviews(id: string) {
+          // Get reviews from API
+          try {
+              const response = await fetch("https://improved-bright-alien.ngrok-free.app/reviews/" + id, {
+                  method: "GET",
+                  headers: {
+                      "ngrok-skip-browser-warning": "any"
+                  },
+              });
+              const resp = await response.json();
+              if (resp.success) {
+                  return resp.data;
+              } else {
+                  return [];
+              }
+          } catch (error) {
+              return false;
+          }
+      },
+
+      async showEntityInfo(index: number){
+        if (document.fullscreenElement ) {
+          document.exitFullscreen();
+        }
+        this.entity = this.locations[index];
+
+        if (/[A-Z]/.test(this.entity.type)) {
+          this.entity.type = this.entity.type.replace(/([A-Z])/g, ' $1').trim();
+        }
+        this.entity.description = this.entity.description.split('-')[0].trim();
+        await this.getReviews(this.entity.eid)
+        .then((data) => {
+          this.reviews = data;
+        });
+        this.globalStore.showEntityCard = true;
+      },
+      
       onRefresh(){
         this.globalStore.clearWatch();
+        this.globalStore.showEntityCard = false;
         this.$router.push('/');
       },
 
@@ -239,6 +292,7 @@
           this.$router.push('/serverError');
         }
         this.updateMarkers();
+        this.globalStore.showEntityCard = false;
       },
 
       async loadRacks() {
@@ -249,6 +303,7 @@
           this.$router.push('/serverError');
         }
         this.updateMarkers();
+        this.globalStore.showEntityCard = false;
       },
 
       panMap(){
@@ -260,11 +315,13 @@
         this.updateCircleRadius();
         map.setZoom(17);
         this.updateCircleRadius();
+        this.globalStore.showEntityCard = false;
 
       },
 
       updateMarkers(){
         this.locations = [];
+        let count = 0;
         // Per ogni entità, calcola il punto medio tra i due punti e lo trasforma in latitudine e longitudine
         (this.globalStore.$state.apiData as any).data.forEach((element: any) => {
           // Coordinate in EPSG:25832
@@ -276,12 +333,12 @@
           } else {
             utmCoordinates = element.geolocation[0];
           }
-          console.log(utmCoordinates);
+          console.log(count++);
           // Trasforma le coordinate da EPSG:25832 a EPSG:4326 (WGS84) (lat, long)
           let latLng = proj4("EPSG:25832", "EPSG:4326", utmCoordinates);
 
-          let pos = { lat: latLng[1], lng: latLng[0] };
-          this.locations.push(pos);
+          element.geolocation[0] = { lat: latLng[1], lng: latLng[0] };
+          this.locations.push(element);
         
         });
       },

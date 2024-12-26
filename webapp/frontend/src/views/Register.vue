@@ -133,6 +133,7 @@
 
 <script lang="ts">
 import { useGlobalStore } from '@/globalStore';
+import { onMounted } from 'vue';
 
     export default {
         name: 'Register',
@@ -140,6 +141,11 @@ import { useGlobalStore } from '@/globalStore';
         setup() {
             const globalStore = useGlobalStore();
 
+            onMounted(() => {
+                globalStore.updateUserPos();
+                globalStore.activePage = 2;
+            });
+            
             return { globalStore }
         },
 

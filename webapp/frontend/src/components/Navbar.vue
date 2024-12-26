@@ -78,15 +78,21 @@
               aria-current="page"
               class="py-0.5 md:py-3 px-4 md:px-1 border-s-2 md:border-s-0 md:border-b-2 border-transparent text-gray-500 hover:text-gray-800 focus:outline-none dark:text-neutral-400 dark:hover:text-neutral-200"
             > {{ page.link.text }} </a> -->
-            <router-link
+            <a
               v-for="(page, index) in pages"
               :key="index"
-              @click.prevent="navLinkClick(index)"
+              @click="navLinkClick(index)"
               :to="page.link.url"
               aria-current="page"
-              class="py-0.5 md:py-3 px-4 md:px-1 border-s-2 md:border-s-0 md:border-b-2 border-transparent text-gray-500 hover:text-gray-800 focus:outline-none dark:text-neutral-400 dark:hover:text-neutral-200"
+              :class="{
+                'text-gray-800': activePage === index,
+                'text-gray-500': activePage !== index,
+                'dark:text-neutral-200': activePage === index,
+                'dark:hover:text-neutral-200': activePage !== index
+              }"
+              class="cursor-pointer py-0.5 md:py-3 px-4 md:px-1 border-s-2 md:border-s-0 md:border-b-2 border-transparent text-gray-500 hover:text-gray-800 focus:outline-none dark:text-neutral-400 dark:hover:text-neutral-200"
             > {{ page.link.text }} 
-            </router-link>
+            </a>
           </div>
         </div>
       </nav>
@@ -95,17 +101,47 @@
   </template>
   
   <script lang="ts">
+import { useGlobalStore } from '@/globalStore';
+
+
     export default {
-        props: ['pages', 'activePage', 'navLinkClick'],
+        props: ['pages', 'activePage'],
+
+        setup() {
+            const globalStore = useGlobalStore();
+            return { globalStore };
+        },
+
         data(){
             return {
                 theme: 'light'
             }
         },
+
         methods: {
-            changeTheme(){
-                this.theme = this.theme === 'light' ? 'dark' : 'light';
+
+          async navLinkClick(index: number) {
+            if (index == 1) {
+                this.goToMap();
+            } else {
+                this.globalStore.activePage = index;
+                console.log(this.globalStore.userLatLng);
+                this.$router.push(this.globalStore.pages[index].link.url);
             }
+          },
+
+          async goToMap() {
+              await this.globalStore.getUserPos();
+              if (this.globalStore.showMap){
+                  this.globalStore.activePage = 1;
+                  this.$router.push('/map');
+              } else {
+                  this.$router.push('/serverError');
+              }
+          },
+          changeTheme(){
+              this.theme = this.theme === 'light' ? 'dark' : 'light';
+          },
         }
     }
   </script>

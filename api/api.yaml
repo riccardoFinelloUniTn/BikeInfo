@@ -1,435 +1,450 @@
 openapi: 3.0.0
 info:
-  title: BikeInfo API
-  description: API sviluppate per il progetto InfoBike durante il corso di Ingegneria del Software (A.A. 2024/2025)
-  version: 0.0.7
-
-servers:
-  - url: http://localhost:3000/api
-    description: Server per la gestione delle richieste API
-
-##General Rules for MongoDB Schema Design:
-#Rule 1: Favor embedding unless there is a compelling reason not to.
-#Rule 2: Needing to access an object on its own is a compelling reason not to embed it.
-#Rule 3: Avoid joins and lookups if possible, but don't be afraid if they can provide a better schema design.
-#Rule 4: Arrays should not grow without bound. If there are more than a couple of hundred documents on the many side, don't embed them; if there are more than a few thousand documents on the many side, don't use an array of ObjectID references. High-cardinality arrays are a compelling reason not to embed.
-#Rule 5: As always, with MongoDB, how you model your data depends entirely on your particular application's data access patterns. You want to structure your data to match the ways that your application queries and updates it.
-
+  title: Bike Info API
+  description: API for managing bike-related data, user feedback, and reviews.
+  version: 1.0.0
+paths:
+  /auth:
+    post:
+      summary: Authenticate user
+      operationId: authenticateUser
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        '200':
+          description: Authentication successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+                  token:
+                    type: string
+        '400':
+          description: Missing or invalid email/password
+        '401':
+          description: Invalid credentials
+        '404':
+          description: User not found
+  /auth/google:
+    post:
+      summary: Google sign-in authentication
+      operationId: signInWithGoogle
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                idToken:
+                  type: string
+      responses:
+        '200':
+          description: Authentication via Google successful
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  uid:
+                    type: string
+                  name:
+                    type: string
+                  surname:
+                    type: string
+                  email:
+                    type: string
+                  role:
+                    type: string
+                  token:
+                    type: string
+        '400':
+          description: Bad request or Google login failed
+        '500':
+          description: Internal server error
+  /register:
+    post:
+      summary: Register user
+      operationId: registerUser
+      responses:
+        '201':
+          description: User registered successfully
+        '400':
+          description: Bad request
+  /register/google:
+    post:
+      summary: Google sign-in registration
+      operationId: signInWithGoogle
+      responses:
+        '201':
+          description: User registered successfully with Google
+        '400':
+          description: Bad request
+  /feedbacks/{eid}:
+    get:
+      summary: Get feedbacks by entity ID
+      parameters:
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity ID
+      responses:
+        '200':
+          description: List of feedbacks
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Feedback'
+        '404':
+          description: Entity not found
+    post:
+      summary: Post feedback for an entity
+      parameters:
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Feedback'
+      responses:
+        '201':
+          description: Feedback created successfully
+        '400':
+          description: Missing or invalid data
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /feedbacks/{fid}:
+    patch:
+      summary: Update feedback
+      parameters:
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Feedback ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                comment:
+                  type: string
+      responses:
+        '200':
+          description: Feedback updated successfully
+        '400':
+          description: Missing or invalid data
+        '401':
+          description: Unauthorized
+        '404':
+          description: Feedback not found
+        '500':
+          description: Internal server error
+  /feedbacks/{fid}/answer:
+    patch:
+      summary: Admin adds or updates an answer to a feedback
+      parameters:
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Feedback ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                answer:
+                  type: string
+      responses:
+        '200':
+          description: Answer updated successfully
+        '400':
+          description: Missing or invalid data
+        '401':
+          description: Unauthorized
+        '404':
+          description: Feedback not found
+        '500':
+          description: Internal server error
+  /feedbacks/{fid}:
+    delete:
+      summary: Delete feedback by ID
+      parameters:
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Feedback ID
+      responses:
+        '200':
+          description: Feedback deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Missing feedback ID
+        '401':
+          description: Unauthorized
+        '403':
+          description: Unauthorized to delete this feedback
+        '404':
+          description: Feedback not found
+        '500':
+          description: Internal server error
+  /reviews/{eid}:
+    get:
+      summary: Get reviews by entity ID
+      parameters:
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity ID
+      responses:
+        '200':
+          description: List of reviews
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Review'
+        '404':
+          description: Entity not found
+    post:
+      summary: Post a review for an entity
+      parameters:
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '201':
+          description: Review created successfully
+        '400':
+          description: Missing or invalid data
+        '401':
+          description: Unauthorized
+        '500':
+          description: Internal server error
+  /reviews/{eid}:
+    patch:
+      summary: Update a review by entity ID
+      parameters:
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Review'
+      responses:
+        '200':
+          description: Review updated successfully
+        '400':
+          description: Missing or invalid data
+        '401':
+          description: Unauthorized
+        '404':
+          description: Review not found
+        '500':
+          description: Internal server error
+  /reviews/{eid}:
+    delete:
+      summary: Delete a review by entity ID
+      parameters:
+        - name: eid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Entity ID
+      responses:
+        '200':
+          description: Review deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        '400':
+          description: Missing review ID
+        '401':
+          description: Unauthorized
+        '403':
+          description: Unauthorized to delete this review
+        '404':
+          description: Review not found
+        '500':
+          description: Internal server error
+  /rastrelliere:
+    get:
+      summary: Get all rastrelliere data
+      operationId: getRastrelliere
+      responses:
+        '200':
+          description: List of rastrelliere
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entity'
+        '500':
+          description: Internal server error
+  /pisteCiclabili:
+    get:
+      summary: Get all piste ciclabili data
+      operationId: getPisteCiclabili
+      responses:
+        '200':
+          description: List of piste ciclabili
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entity'
+        '500':
+          description: Internal server error
+  /centroInBici:
+    get:
+      summary: Get all centro in bici data
+      operationId: getCentroInBici
+      responses:
+        '200':
+          description: List of centro in bici
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entity'
+        '500':
+          description: Internal server error
+  /parcheggiProtetti:
+    get:
+      summary: Get all parcheggi protetti data
+      operationId: getParcheggiProtetti
+      responses:
+        '200':
+          description: List of parcheggi protetti
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Entity'
+        '500':
+          description: Internal server error
 components:
   schemas:
-    User:
-      type: object
-      properties:
-        uid:
-          type: string
-          example: "12345"
-        name:
-          type: string
-          example: "John"
-        surname:
-          type: string
-          example: "Cena"
-        email:
-          type: string
-          example: "john.cena@gmail.com"
-        password: # Hashed password
-          type: string
-          example: "5d41402abc4b2a76b9719d911017c592"
-        picture:
-          type: string
-          example: "https://example.com/picture.jpg"
-
     Entity:
       type: object
       properties:
         eid:
           type: string
-          example: "12345"
         name:
           type: string
-          example: "Rastrelliera Albere"
         description:
           type: string
-          example: "Rastrelliera per biciclette"
         geolocation:
-          type: string
-          example: "45.123456, 9.123456"
+          type: array
+          items:
+            type: number
         type:
           type: string
-          example: "Rastrelliera"
         rating:
           type: number
-          example: 4.5
-        reviews:
-          type: array
-          items:
-            $ref: "#/components/schemas/Review"
-        feedbacks:
-          type: array
-          items:
-            $ref: "#/components/schemas/Feedback"
-
-    Review:
-      type: object
-      properties:
-        rid:
-          type: string
-          example: "12345"
-        entityId:
-          type: string
-          example: "12345"
-        rating:
-          type: number #from 1 to 5 stars
-          example: 4
-        uEmail:
-          type: string
-          example: "john.cena@gmail.com"
-        comment:
-          type: string
-          example: "Ottimo servizio!"
-        date:
-          type: string
-          format: date-time
-          example: "31-12-2024"
-
     Feedback:
       type: object
       properties:
         fid:
           type: string
-          example: "12345"
         entityId:
           type: string
-          example: "12345"
         uEmail:
           type: string
-          example: "john.cena@gmail.com"
         comment:
           type: string
-          example: "C'è una buca in via Roma!"
+        answer:
+          type: string
         geolocation:
           type: string
-          example: "45.123456, 9.123456"
         date:
           type: string
           format: date-time
-          example: "31-12-2024"
-
-paths:
-  /test:
-    get:
-      summary: Test API
-      description: Test API per verificare il funzionamento del server
-      responses:
-        "200":
-          description: Risposta di successo
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Hello, World!"
-
-  /users:
-    get:
-      summary: Lista utenti
-      description: Restituisce la lista degli utenti registrati
-      responses:
-        "200":
-          description: Risposta di successo
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/User"
-
-    post:
-      summary: Registrazione utente
-      description: Registra un nuovo utente
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        "201":
-          description: Utente registrato con successo
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Errore nei dati inviati
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Errore nei dati inviati"
-        "409":
-          description: Utente già registrato
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Utente già registrato"
-
-  /users/{uid}:
-    get:
-      summary: Dettagli utente
-      description: Restituisce i dettagli di un utente
-      parameters:
-        - in: path
-          name: uid
-          required: true
-          description: ID dell'utente
-          schema:
-            type: string
-            example: "12345"
-      responses:
-        "200":
-          description: Risposta di successo
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "404":
-          description: Utente non trovato
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Utente non trovato"
-
-    put:
-      summary: Modifica utente
-      description: Modifica i dati di un utente
-      parameters:
-        - in: path
-          name: uid
-          required: true
-          description: ID dell'utente
-          schema:
-            type: string
-            example: "12345"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/User"
-      responses:
-        "200":
-          description: Utente modificato con successo
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/User"
-        "400":
-          description: Errore nei dati inviati
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Errore nei dati inviati"
-        "404":
-          description: Utente non trovato
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Utente non trovato"
-
-    delete:
-      summary: Elimina utente
-      description: Elimina un utente
-      parameters:
-        - in: path
-          name: uid
-          required: true
-          description: ID dell'utente
-          schema:
-            type: string
-            example: "12345"
-      responses:
-        "204":
-          description: Utente eliminato con successo
-        "404":
-          description: Utente non trovato
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Utente non trovato"
-
-  /entities:
-    get:
-      summary: Lista entità
-      description: Restituisce la lista delle entità registrate
-      responses:
-        "200":
-          description: Risposta di successo
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Entity"
-
-    post:
-      summary: Registrazione entità
-      description: Registra una nuova entità
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Entity"
-      responses:
-        "201":
-          description: Entità registrata con successo
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Entity"
-        "400":
-          description: Errore nei dati inviati
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Errore nei dati inviati"
-        "409":
-          description: Entità già registrata
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Entità già registrata"
-
-  /entities/{eid}:
-    get:
-      summary: Dettagli entità
-      description: Restituisce i dettagli di un'entità
-      parameters:
-        - in: path
-          name: eid
-          required: true
-          description: ID dell'entità
-          schema:
-            type: string
-            example: "12345"
-      responses:
-        "200":
-          description: Risposta di successo
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Entity"
-        "404":
-          description: Entità non trovata
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Entità non trovata"
-
-    put:
-      summary: Modifica entità
-      description: Modifica i dati di un'entità
-      parameters:
-        - in: path
-          name: eid
-          required: true
-          description: ID dell'entità
-          schema:
-            type: string
-            example: "12345"
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/Entity"
-      responses:
-        "200":
-          description: Entità modificata con successo
-          content:
-            application/json:
-              schema:
-                $ref: "#/components/schemas/Entity"
-        "400":
-          description: Errore nei dati inviati
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Errore nei dati inviati"
-        "404":
-          description: Entità non trovata
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Entità non trovata"
-
-    delete:
-      summary: Elimina entità
-      description: Elimina un'entità
-      parameters:
-        - in: path
-          name: eid
-          required: true
-          description: ID dell'entità
-          schema:
-            type: string
-            example: "12345"
-      responses:
-        "204":
-          description: Entità eliminata con successo
-        "404":
-          description: Entità non trovata
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  message:
-                    type: string
-                    example: "Entità non trovata"
+    Review:
+      type: object
+      properties:
+        entityId:
+          type: string
+        rating:
+          type: number
+        uEmail:
+          type: string
+        uName:
+          type: string
+        comment:
+          type: string
+        date:
+          type: string
+          format: date-time

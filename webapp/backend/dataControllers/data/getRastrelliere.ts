@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import entityModel from "../model/entity.model";
+import entityModel from "../../model/entity.model";
 
 export const getRastrelliere: RequestHandler = async (req: Request, res: Response, next: NextFunction): Promise<void> => {
     try {

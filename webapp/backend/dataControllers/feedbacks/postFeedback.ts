@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import feedbackModel from "../model/feedback.model";
+import feedbackModel from "../../model/feedback.model";
 import jwt from "jsonwebtoken";
 import { v4 as uuidv4 } from "uuid"; // To generate unique `fid` values
 import dotenv from "dotenv";

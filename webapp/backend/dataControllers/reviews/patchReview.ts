@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import feedbackModel from "../model/review.model";
+import feedbackModel from "../../model/review.model";
 
 export const patchReview: RequestHandler = async (
   req: Request,

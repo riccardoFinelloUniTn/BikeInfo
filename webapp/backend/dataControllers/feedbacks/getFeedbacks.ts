@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import feedbackModel from "../model/feedback.model";
+import feedbackModel from "../../model/feedback.model";
 
 export const getFeedbacksByEntityId: RequestHandler = async (
   req: Request,

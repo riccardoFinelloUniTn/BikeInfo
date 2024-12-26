@@ -4,12 +4,16 @@ import { authenticateUser } from "./auth/authController";
 import { signInWithGoogle } from "./auth/googleAuth";
 import { registerUser } from "./auth/register";
 import { tokenChecker } from "./auth/tokenChecker";
-import { getFeedbacksByEntityId } from "./dataControllers/getFeedbacks";
-import { getReviewsByEntityId } from "./dataControllers/getReviews";
-import { postFeedback } from "./dataControllers/postFeedback";
-import { postReview } from "./dataControllers/postReview";
-import { patchReview } from "./dataControllers/patchReview";
-import { deleteReview } from "./dataControllers/deleteReview";
+
+import { getFeedbacksByEntityId } from "./dataControllers/feedbacks/getFeedbacks";
+import { postFeedback } from "./dataControllers/feedbacks/postFeedback";
+import { deleteFeedback } from "./dataControllers/feedbacks/deleteFeedback";
+import { patchFeedback } from "./dataControllers/feedbacks/patchFeedback";
+
+import { getReviewsByEntityId } from "./dataControllers/reviews/getReviews";
+import { postReview } from "./dataControllers/reviews/postReview";
+import { patchReview } from "./dataControllers/reviews/patchReview";
+import { deleteReview } from "./dataControllers/reviews/deleteReview";
 
 import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
 import getOpenDataCentroInBici from "./opendata/centroInBici";
@@ -22,10 +26,10 @@ import { fetchAndRefreshParcheggioProtetto } from "./opendata/parcheggioprotetto
 import { fetchAndRefreshCentroInBici } from "./opendata/centroInBici";
 import { fetchAndRefreshPisteCiclabili } from "./opendata/pisteciclabili";
 
-import  getRastrelliere from "./dataControllers/getRastrelliere";
-import getCentroInBici from "./dataControllers/getCentroInBici";
-import getPisteCiclabili from "./dataControllers/getPisteCiclabili";
-import getParcheggiProtetti from "./dataControllers/getParcheggiProtetti";
+import  getRastrelliere from "./dataControllers/data/getRastrelliere";
+import getCentroInBici from "./dataControllers/data/getCentroInBici";
+import getPisteCiclabili from "./dataControllers/data/getPisteCiclabili";
+import getParcheggiProtetti from "./dataControllers/data/getParcheggiProtetti";
 
 const fs = require('node:fs/promises');
 
@@ -155,6 +159,8 @@ app.post("/register", registerUser);
 
 app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
 app.post("/feedbacks/:eid", tokenChecker, postFeedback);
+app.delete("/feedbacks/", tokenChecker, deleteFeedback);
+app.patch("/feedbacks/", tokenChecker, patchFeedback);
 
 app.get("/reviews/:eid", getReviewsByEntityId);
 app.post("/reviews/:eid", tokenChecker, postReview);

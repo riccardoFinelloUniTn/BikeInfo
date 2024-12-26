@@ -1,5 +1,5 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import feedbackModel from "../model/review.model";
+import reviewModel from "../../model/review.model";
 
 export const deleteReview: RequestHandler = async (
   req: Request,
@@ -19,7 +19,7 @@ export const deleteReview: RequestHandler = async (
     const { email: uEmail } = JSON.parse(loggedUser);
 
     // Find and delete the review
-    const deletedReview = await feedbackModel.findOneAndDelete({ entityId: eid, uEmail }).exec();
+    const deletedReview = await reviewModel.findOneAndDelete({ entityId: eid, uEmail }).exec();
 
     if (!deletedReview) {
       res.status(404).json({

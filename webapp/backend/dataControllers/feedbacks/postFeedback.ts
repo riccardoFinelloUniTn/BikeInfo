@@ -36,12 +36,18 @@ export const postFeedback: RequestHandler = async (req: Request, res: Response, 
     const uEmail = decoded.email;
 
     // Extract feedback data from the request body
-    const { entityId, comment } = req.body;
+    const { comment } = req.body;
 
-    if (!entityId || !comment) {
+    
+
+    const { eid } = req.params;
+
+    console.log(eid);
+
+    if (!comment) {
       res.status(400).json({
         success: false,
-        message: "Entity ID, comment are required.",
+        message: "Comment is required.",
       });
       return;
     }
@@ -52,7 +58,7 @@ export const postFeedback: RequestHandler = async (req: Request, res: Response, 
     // Save the feedback to the database
     const newFeedback = new feedbackModel({
       fid,
-      entityId,
+      entityId: eid,
       uEmail,
       comment,
       geolocation: "prova",

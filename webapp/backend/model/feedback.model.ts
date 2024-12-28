@@ -15,7 +15,7 @@ interface IFeedback extends Document {
 
 const feedbackSchema: Schema = new mongoose.Schema({
   fid: { type: String, required: true, unique: true },
-  entityId: { type: mongoose.Schema.Types.ObjectId, ref: 'Entity', required: true },
+  entityId: { type: String, required: true },
   uEmail: { type: String, required: true },
   comment: { type: String, required: true },
   answer: {type: String, required: false},

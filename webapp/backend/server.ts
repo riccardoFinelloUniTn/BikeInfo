@@ -9,6 +9,7 @@ import { getFeedbacksByEntityId } from "./dataControllers/feedbacks/getFeedbacks
 import { postFeedback } from "./dataControllers/feedbacks/postFeedback";
 import { deleteFeedback } from "./dataControllers/feedbacks/deleteFeedback";
 import { patchFeedback } from "./dataControllers/feedbacks/patchFeedback";
+import { patchFeedbackAnswer } from "./dataControllers/feedbacks/patchFeedbackAnswer";
 
 import { getReviewsByEntityId } from "./dataControllers/reviews/getReviews";
 import { postReview } from "./dataControllers/reviews/postReview";
@@ -160,7 +161,9 @@ app.post("/register", registerUser);
 app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
 app.post("/feedbacks/:eid", tokenChecker, postFeedback);
 app.delete("/feedbacks/", tokenChecker, deleteFeedback);
-app.patch("/feedbacks/", tokenChecker, patchFeedback);
+app.patch("/feedbacks/:fid", tokenChecker, patchFeedback);
+
+app.patch("/feedbacks/:fid/answer", tokenChecker, patchFeedbackAnswer);       //admin adding (or updating) their answer
 
 app.get("/reviews/:eid", getReviewsByEntityId);
 app.post("/reviews/:eid", tokenChecker, postReview);

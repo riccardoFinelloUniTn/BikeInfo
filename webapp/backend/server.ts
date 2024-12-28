@@ -1,9 +1,11 @@
 import dotenv from "dotenv";
 import express, { Express, NextFunction, Request, Response } from "express";
+
 import { authenticateUser } from "./auth/authController";
 import { signInWithGoogle } from "./auth/googleAuth";
 import { registerUser } from "./auth/register";
 import { tokenChecker } from "./auth/tokenChecker";
+import { isLoggedIn } from "./auth/isLogged";
 
 import { getFeedbacksByEntityId } from "./dataControllers/feedbacks/getFeedbacks";
 import { postFeedback } from "./dataControllers/feedbacks/postFeedback";
@@ -157,6 +159,7 @@ app.post("/auth", authenticateUser);
 app.post("/auth/google", signInWithGoogle);
 app.post("/register/google", signInWithGoogle);
 app.post("/register", registerUser);
+app.get("/islogged", isLoggedIn);
 
 app.get("/feedbacks/:eid", tokenChecker, getFeedbacksByEntityId);
 app.post("/feedbacks/:eid", tokenChecker, postFeedback);

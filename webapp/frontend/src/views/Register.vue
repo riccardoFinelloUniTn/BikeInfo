@@ -142,7 +142,6 @@ import { onMounted } from 'vue';
             const globalStore = useGlobalStore();
 
             onMounted(() => {
-                globalStore.updateUserPos();
                 globalStore.activePage = 2;
             });
             

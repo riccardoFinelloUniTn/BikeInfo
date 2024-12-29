@@ -123,7 +123,6 @@ export default {
         const globalStore = useGlobalStore();
 
     onMounted(() => {
-        globalStore.updateUserPos();
         globalStore.activePage = 2;
     });
 

@@ -125,7 +125,6 @@ import { useGlobalStore } from '@/globalStore';
                 this.goToMap();
             } else {
                 this.globalStore.activePage = index;
-                console.log(this.globalStore.userLatLng);
                 this.$router.push(this.globalStore.pages[index].link.url);
             }
           },

@@ -11,11 +11,7 @@
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:ital,opsz,wght@0,14..32,100..900;1,14..32,100..900&display=swap" rel="stylesheet">
     
-    <!-- TODO: da cambiare, nell'head non si può vedere... -->
     <script lang="ts">
-      // document.addEventListener('gesturestart', function (e) {
-      //   e.preventDefault();
-      // });
       const html = document.querySelector('html');
       const isLightOrAuto = localStorage.getItem('hs_theme') === 'light' || (localStorage.getItem('hs_theme') === 'auto' && !window.matchMedia('(prefers-color-scheme: dark)').matches);
       const isDarkOrAuto = localStorage.getItem('hs_theme') === 'dark' || (localStorage.getItem('hs_theme') === 'auto' && window.matchMedia('(prefers-color-scheme: dark)').matches);
@@ -27,7 +23,7 @@
     </script>
     
   </head>
-  <body class="bg-[#609966] dark:bg-[#0c3e11] text-[#EDF1D6]"> <!-- style="position: fixed; overflow: hidden;"> -->
+  <body class="bg-[#609966] dark:bg-[#0c3e11] text-[#EDF1D6]"> <!--  -->
     <div id="app"></div>
     <script src="./node_modules/preline/dist/preline.js"></script>
   </body>

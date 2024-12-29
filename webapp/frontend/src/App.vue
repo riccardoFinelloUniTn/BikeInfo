@@ -37,6 +37,7 @@
     </div>
 </template>
 
+
 <script lang="ts">
 import { onMounted } from 'vue'
 import { type IStaticMethods } from 'preline/preline'
@@ -56,17 +57,17 @@ declare global {
 
 export default {
     setup() {
-        onMounted(() => {
-            setTimeout(() => {
-                window.HSStaticMethods.autoInit()
-            }, 100)
-        });
 
         const globalStore = useGlobalStore();
+        
+        onMounted(async () => {
+            await globalStore.checkIfLoggedIn();
+            setTimeout(() => {
+                window.HSStaticMethods.autoInit();
+            }, 100);
+        });
 
-        globalStore.checkIfLoggedIn();
-        globalStore.updatePages();
-
+        
         return { globalStore };
     },
     // computed: {
@@ -79,6 +80,7 @@ export default {
         // RegLogController,
     },
     data() {
+
         return {
             // showMap: true,
             // rangeError: 0,
@@ -110,12 +112,6 @@ export default {
 
     async mounted() {
 
-        const response = await this.globalStore.getApiData("parcheggiProtetti");
-        
-        if (!response.success) {
-            this.globalStore.showMap = false;
-            console.log("Server error");
-        }
         // try {
         //     const response = await this.getRastrelliere();
         //     console.log(this.rastrelliere);

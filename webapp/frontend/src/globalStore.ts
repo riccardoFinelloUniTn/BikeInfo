@@ -11,6 +11,8 @@ export const useGlobalStore = defineStore('global', {
         showEntityCard: false,
 
         isLoggedIn: false,
+        userInfo: null as any,
+        token: "",
 
         apiData: null,
         activePage: 0,
@@ -31,12 +33,7 @@ export const useGlobalStore = defineStore('global', {
                 pageTitle: 'Login Page',
                 content: 'This is the login page.',
             },
-            {
-                link: { text: 'Profile', url: '/profile' },
-                pageTitle: 'Profile Page',
-                content: 'This is the profile page.',
-            },
-        ],
+        ] as Array<any>,
     }),
 
     
@@ -89,6 +86,7 @@ export const useGlobalStore = defineStore('global', {
                     console.log("Map is not visible.");
                     reject();
                 } else {
+                    console.log("Getting user position...");
                     navigator.geolocation.getCurrentPosition(
                         // Success
                         (position: GeolocationPosition) => {
@@ -116,10 +114,26 @@ export const useGlobalStore = defineStore('global', {
         },
 
         clearWatch(): void {
-            if (this.watchId !== null) {
+            if (this.watchId != null) {
               navigator.geolocation.clearWatch(this.watchId);
-              this.watchId = null;
               console.log("Geolocation watch cleared.");
+            }
+        },
+
+        async isTokenValid(): Promise<any> {
+            try {
+                const response = await fetch("https://improved-bright-alien.ngrok-free.app/islogged", {
+                    method: "GET",
+                    headers: {
+                        "ngrok-skip-browser-warning": "any",
+                        "authorization": "Bearer " + (localStorage.getItem("token") || sessionStorage.getItem("token")) as string,
+                    },
+                });
+                const resp = await response.json();
+                // console.log(resp);
+                return resp;
+            } catch (error) {
+                return false;
             }
         },
 
@@ -165,6 +179,7 @@ export const useGlobalStore = defineStore('global', {
                     }
                     this.isLoggedIn = true;
                     this.updatePages();
+                    this.checkIfLoggedIn();
                     return data;
                 } else {
                     this.isLoggedIn = false;
@@ -177,11 +192,20 @@ export const useGlobalStore = defineStore('global', {
             }
         },
 
-        checkIfLoggedIn(): void {
+        async checkIfLoggedIn(): Promise<void> {
             const token = localStorage.getItem("token") || sessionStorage.getItem("token");
             if (token) {
-                this.isLoggedIn = true;
+                const resp = await this.isTokenValid();
+                if (resp.loggedIn) {
+                    this.isLoggedIn = true;
+                    this.userInfo = resp.user;
+                    this.token = token;
+                    this.updatePages();
+                } else {
+                    this.isLoggedIn = false;
+                }
             } else {
+                console.log("No token found.");
                 this.isLoggedIn = false;
             }
         },

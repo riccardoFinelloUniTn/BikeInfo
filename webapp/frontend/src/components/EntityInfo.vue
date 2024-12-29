@@ -89,34 +89,18 @@
             <ul class="space-y-5">
 
               <!-- Chat -->
-              <li class="max-w-lg flex gap-x-2 sm:gap-x-4">
+              <li 
+                v-for="review in reviewsToShow"
+                class="max-w-lg flex gap-x-2 sm:gap-x-4">
                 <div class="grow space-y-3">
                   <!-- Card -->
                   <div
                     class="space-y-1 bg-white border border-gray-200 rounded-2xl p-4 dark:bg-neutral-900 dark:border-neutral-700">
                     <h2 class="font-bold text-gray-800 dark:text-white">
-                      {{ reviewsToShow.owner }}
+                      {{ review.uName }}
                     </h2>
                     <p class="ml-1 mb-1.5 text-sm text-gray-800 dark:text-white">
-                      {{ reviewsToShow.desc }}
-                    </p>
-                  </div>
-                  <!-- End Card -->
-                </div>
-              </li>
-              <!-- End Chat -->
-
-              <!-- Chat -->
-              <li class="max-w-lg flex gap-x-2 sm:gap-x-4">
-                <div class="grow space-y-3">
-                  <!-- Card -->
-                  <div
-                    class="space-y-1 bg-white border border-gray-200 rounded-2xl p-4 dark:bg-neutral-900 dark:border-neutral-700">
-                    <h2 class="font-bold text-gray-800 dark:text-white">
-                      {{ reviewsToShow.owner }}
-                    </h2>
-                    <p class="ml-1 mb-1.5 text-sm text-gray-800 dark:text-white">
-                      {{ reviewsToShow.desc }}
+                      {{ review.comment }}
                     </p>
                   </div>
                   <!-- End Card -->
@@ -349,7 +333,7 @@ export default {
       this.showInfoForm = false;
     },
 
-    sendReview(): void {
+    async sendReview() {
       console.log('sendReview');
       if ((document.getElementById("input-label") as HTMLInputElement)?.value == "") {
         document.getElementById("title-error")?.classList.remove("hidden");
@@ -378,6 +362,25 @@ export default {
         rating = 1;
       }
 
+      try {
+        console.log("Bearer " + this.globalStore.token);
+          const response = await fetch("https://improved-bright-alien.ngrok-free.app/reviews/" + this.entityToShow.eid, {
+              method: "POST",
+              headers: {
+                  "ngrok-skip-browser-warning": "any",
+                  "Content-Type": "application/json",
+                  "authorization": "Bearer " + this.globalStore.token,
+              },
+              body: JSON.stringify({
+                rating: rating,
+                comment: (document.getElementById("textarea-label") as HTMLTextAreaElement)?.value,
+              })
+          });
+          const resp = await response.json();
+          console.log(resp);
+      } catch (error) {
+          console.log(error);
+      }
 
     },
 

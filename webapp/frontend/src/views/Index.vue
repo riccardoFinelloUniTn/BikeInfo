@@ -1,6 +1,6 @@
 <template>
     <!-- Hero -->
-    <div class="pt-10 bg-gradient-to-b from-violet-600/10 via-transparent" style=" background-image: url('../assets/index_bg.jpg')">
+    <div class="pt-10 bg-gradient-to-b from-violet-600/10 via-transparent bg-cover bg-center"> <!-- TODO: add bg image -->
         <div class="max-w-[85rem] mx-auto px-4 sm:px-6 lg:px-8 py-24 space-y-8">
             <!-- Announcement Banner -->
             <!-- <div class="flex justify-center">
@@ -48,16 +48,24 @@
 
 <script lang="ts">
 import { useGlobalStore } from '@/globalStore';
+import { onMounted } from 'vue';
 
 export default{
     setup() {
         const globalStore = useGlobalStore();
+
+        onMounted(() => {
+            globalStore.activePage = 0;
+        });
         return { globalStore }
     },
     methods: {
         async goToMap() {
+            console.log("button clicked");
             await this.globalStore.getUserPos();
-            if (this.globalStore.$state.showMap){
+            console.log("user pos acquired");
+            console.log("show: " + this.globalStore.showMap);
+            if (this.globalStore.showMap){
                 this.$router.push('/map');
             } else {
                 this.$router.push('/serverError');

@@ -145,7 +145,7 @@
       const userCircleRadius = this.calculateRadius(zoom);
 
       const entity: {description: string, eid: string, geolocation: [], name: string, rating: number, type: string} = {description: "", eid: "", geolocation: [], name: "", rating: 0, type: ""};
-      const reviews: {owner: string, desc: string}[] = [];
+      const reviews = [] as Array<{owner: string, comment: string}>;
       // const rast = Object.assign({}, this.rastLocs);
       // const updatedRangeError = this.rangeError;
       // const updatedUsrLatLang = this.userLatLng;
@@ -250,13 +250,14 @@
                   },
               });
               const resp = await response.json();
+              console.log(resp);  
               if (resp.success) {
-                  return resp.data;
+                  return resp.reviews;
               } else {
                   return [];
               }
           } catch (error) {
-              return false;
+              return [];
           }
       },
 
@@ -270,10 +271,12 @@
           this.entity.type = this.entity.type.replace(/([A-Z])/g, ' $1').trim();
         }
         this.entity.description = this.entity.description.split('-')[0].trim();
-        await this.getReviews(this.entity.eid)
-        .then((data) => {
-          this.reviews = data;
-        });
+
+        let resp = await this.getReviews(this.entity.eid);
+        console.log(this.entity);
+
+        this.reviews = resp;
+
         this.globalStore.showEntityCard = true;
       },
       

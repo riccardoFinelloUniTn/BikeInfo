@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import feedbackModel from "../../model/review.model";
+import reviewModel from "../../model/review.model";
+import entityModel from "../../model/entity.model";
 import { v4 as uuidv4 } from "uuid";
 import dotenv from "dotenv";
 
@@ -36,7 +37,17 @@ export const postReview: RequestHandler = async (req: Request, res: Response, ne
       return;
     }
 
-    const existingReview = await feedbackModel.findOne({ entityId: eid, uEmail }).exec();
+    const existingReview = await reviewModel.findOne({ entityId: eid, uEmail }).exec();
+
+    const entity = await entityModel.findOne({eid: eid}).exec();
+
+    if(!entity){
+      res.status(501).json({
+        success: false,
+        message: "Server can't find an entity with such ID",
+      });
+      return;
+    }
 
     console.log(eid + uEmail + existingReview);
     if (existingReview) {
@@ -56,9 +67,16 @@ export const postReview: RequestHandler = async (req: Request, res: Response, ne
       return;
     }
 
+    entity.rating = ((entity.rating * entity.reviews + rating) / (entity.reviews+1))
+    entity.reviews = entity.reviews+1;
+
+    await entity.save();
+
     const fid = uuidv4();
 
-    const newFeedback = new feedbackModel({
+    
+
+    const newFeedback = new reviewModel({
       fid,
       entityId: eid,
       uEmail,
@@ -69,6 +87,8 @@ export const postReview: RequestHandler = async (req: Request, res: Response, ne
     });
 
     await newFeedback.save();
+
+
 
     // Respond with success
     res.status(201).json({

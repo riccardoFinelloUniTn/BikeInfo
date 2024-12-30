@@ -1,5 +1,6 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
 import reviewModel from "../../model/review.model";
+import entityModel from "../../model/entity.model";
 
 export const deleteReview: RequestHandler = async (
   req: Request,
@@ -20,6 +21,15 @@ export const deleteReview: RequestHandler = async (
 
     // Find and delete the review
     const deletedReview = await reviewModel.findOneAndDelete({ entityId: eid, uEmail }).exec();
+    const entity = await entityModel.findOne({eid: eid}).exec();
+        
+    if(!entity){
+      res.status(501).json({
+        success: false,
+        message: "Server can't find an entity with such ID",
+      });
+      return;
+    }
 
     if (!deletedReview) {
       res.status(404).json({
@@ -28,6 +38,17 @@ export const deleteReview: RequestHandler = async (
       });
       return;
     }
+    if(entity.reviews > 1){
+      entity.rating = ((entity.rating * entity.reviews - deletedReview.rating)/(entity.reviews - 1))
+      entity.reviews = entity.reviews-1;
+    }
+    else{
+      entity.rating = 0;
+      entity.reviews = 0;
+    }
+
+    entity.save();
+    
 
     // Respond with success
     res.status(200).json({

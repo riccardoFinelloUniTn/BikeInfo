@@ -6,6 +6,7 @@ import { Response } from "express";
 import entityModel from "../model/entity.model";
 import mongoose from "mongoose";
 import crypto from "crypto";
+import reviewModel from "../model/review.model";
 
 const file = fs.createWriteStream("dist/opendata/rastrelliere.zip");
 
@@ -51,36 +52,43 @@ export const fetchAndRefreshRastrelliere = async (jsonData: string): Promise<voi
       throw new Error("Invalid JSON format: 'features' array missing.");
     }
 
-    const operations = data.features
-      .map((feature: any) => {
+    const operations = await Promise.all(
+      data.features.map(async (feature: any) => {
         const { zona, tipologia } = feature.properties;
         const { coordinates } = feature.geometry;
-
+    
         if (!zona || !tipologia || !coordinates) {
           console.log("Invalid feature:", feature);
           return null;
         }
-
+    
         const eid = crypto.createHash("md5").update(JSON.stringify(coordinates)).digest("hex");
-
+    
+        const reviewsData = await reviewModel.find({ entityId: eid });
+        const totalReviews = reviewsData.length;
+        const averageRating = totalReviews > 0
+          ? reviewsData.reduce((sum, review) => sum + review.rating, 0) / totalReviews
+          : 0;
+    
         return {
           updateOne: {
-            filter: { eid }, // Match by hashed `eid`
+            filter: { eid }, // Match existing documents by unique `eid`
             update: {
               eid,
               name: zona,
               description: tipologia,
               geolocation: coordinates,
               type: "rastrelliera",
-              rating: 0,
-              //reviews: 0,
-              //feedbacks: [],
+              rating: averageRating,
+              reviews: totalReviews,
             },
             upsert: true, // Insert if not found
           },
         };
       })
-      .filter((op:any): op is Exclude<typeof op, null> => op !== null); // Filter out null operations
+    );
+    
+    const filteredOperations = operations.filter((op): op is Exclude<typeof op, null> => op !== null);
 
     if (operations.length > 0) {
       await entityModel.bulkWrite(operations);

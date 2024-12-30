@@ -18,7 +18,6 @@ import { postReview } from "./dataControllers/reviews/postReview";
 import { patchReview } from "./dataControllers/reviews/patchReview";
 import { deleteReview } from "./dataControllers/reviews/deleteReview";
 
-import getBikeSharing from "./opendata/bikeSharing"; //non va la parte di weelo 
 import getOpenDataCentroInBici from "./opendata/centroInBici";
 import getOpenDataParcheggioProtetto from "./opendata/parcheggioprotetto";
 import getOpenDataPisteCiclabili from "./opendata/pisteciclabili";

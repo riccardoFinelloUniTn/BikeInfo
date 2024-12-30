@@ -1,5 +1,7 @@
 import { Request, Response, NextFunction, RequestHandler } from "express";
-import feedbackModel from "../../model/review.model";
+import reviewModel from "../../model/review.model";
+import entityModel from "../../model/entity.model";
+
 
 export const patchReview: RequestHandler = async (
   req: Request,
@@ -36,7 +38,18 @@ export const patchReview: RequestHandler = async (
     }
 
     // Find the review to update
-    const existingReview = await feedbackModel.findOne({ entityId: eid, uEmail }).exec();
+    const existingReview = await reviewModel.findOne({ entityId: eid, uEmail }).exec();
+
+    const entity = await entityModel.findOne({eid: eid}).exec();
+    
+    if(!entity){
+      res.status(501).json({
+        success: false,
+        message: "Server can't find an entity with such ID",
+      });
+      return;
+    }
+
 
     if (!existingReview) {
       res.status(404).json({
@@ -46,12 +59,18 @@ export const patchReview: RequestHandler = async (
       return;
     }
 
+    const oldRating = existingReview.rating;
+
     // Update the fields
     if (comment) existingReview.comment = comment;
     if (rating) existingReview.rating = rating;
+
+    entity.rating = ((entity.rating * entity.reviews - oldRating + rating) / entity.reviews)
+
     existingReview.date = new Date();
 
     await existingReview.save();
+    await entity.save();
 
     res.status(200).json({
       success: true,

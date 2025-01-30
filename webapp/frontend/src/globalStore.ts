@@ -2,6 +2,8 @@ import { defineStore } from 'pinia';
 
 export const useGlobalStore = defineStore('global', {
     state: () => ({
+
+        serverAddress: "https://improved-bright-alien.ngrok-free.app",
         showMap: true,
         rangeError: 0,
         userLatLng: {
@@ -38,6 +40,11 @@ export const useGlobalStore = defineStore('global', {
 
     
     actions: {
+        logout() {
+            localStorage.removeItem("token");
+            this.checkIfLoggedIn;
+        },
+
         async updateUserPos(): Promise<GeolocationPosition> {
             return new Promise((resolve, reject) => {
                 if (!navigator.geolocation) {
@@ -81,10 +88,6 @@ export const useGlobalStore = defineStore('global', {
                     console.log("Geolocation is not supported by your browser.");
                     this.showMap = false;
                     reject();
-                }
-                else if (!this.showMap) {
-                    console.log("Map is not visible.");
-                    reject();
                 } else {
                     console.log("Getting user position...");
                     navigator.geolocation.getCurrentPosition(
@@ -122,11 +125,11 @@ export const useGlobalStore = defineStore('global', {
 
         async isTokenValid(): Promise<any> {
             try {
-                const response = await fetch("https://improved-bright-alien.ngrok-free.app/islogged", {
+                const response = await fetch(this.serverAddress + "/islogged", {
                     method: "GET",
                     headers: {
                         "ngrok-skip-browser-warning": "any",
-                        "authorization": "Bearer " + (localStorage.getItem("token") || sessionStorage.getItem("token")) as string,
+                        "authorization": "Bearer " + localStorage.getItem("token"),
                     },
                 });
                 const resp = await response.json();
@@ -140,7 +143,7 @@ export const useGlobalStore = defineStore('global', {
         // API CALLS
         async getApiData(resource: string): Promise<any> {
             try {
-                const response = await fetch("https://improved-bright-alien.ngrok-free.app/" + resource, {
+                const response = await fetch(this.serverAddress + "/" + resource, {
                     method: "GET",
                     headers: {
                         "ngrok-skip-browser-warning": "any"
@@ -157,7 +160,7 @@ export const useGlobalStore = defineStore('global', {
 
         async login(email: string, password: string, remember: boolean) : Promise<any> {
             try {
-                const response = await fetch("https://improved-bright-alien.ngrok-free.app/auth", {
+                const response = await fetch(this.serverAddress + "/auth", {
                     method: "POST",
                     headers: {
                         "ngrok-skip-browser-warning": "any",
@@ -175,7 +178,7 @@ export const useGlobalStore = defineStore('global', {
                     if (remember) {
                         localStorage.setItem("token", data.token); // persistent
                     } else {
-                        sessionStorage.setItem("token", data.token); // session only
+                        this.token = data.token; // session only
                     }
                     this.isLoggedIn = true;
                     this.updatePages();
@@ -193,21 +196,23 @@ export const useGlobalStore = defineStore('global', {
         },
 
         async checkIfLoggedIn(): Promise<void> {
-            const token = localStorage.getItem("token") || sessionStorage.getItem("token");
+            const token = localStorage.getItem("token") || this.token;
             if (token) {
                 const resp = await this.isTokenValid();
                 if (resp.loggedIn) {
                     this.isLoggedIn = true;
                     this.userInfo = resp.user;
                     this.token = token;
-                    this.updatePages();
                 } else {
                     this.isLoggedIn = false;
+                    this.userInfo = null;
                 }
             } else {
                 console.log("No token found.");
                 this.isLoggedIn = false;
+                this.userInfo = null;
             }
+            this.updatePages();
         },
 
         updatePages(): void {

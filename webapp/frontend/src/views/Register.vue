@@ -208,7 +208,7 @@ import { onMounted } from 'vue';
                 }
                 
                 try {
-                    await fetch("https://improved-bright-alien.ngrok-free.app/register", {
+                    await fetch(this.globalStore.serverAddress + "/register", {
                         method: "POST",
                         headers: {
                             "ngrok-skip-browser-warning": "any",

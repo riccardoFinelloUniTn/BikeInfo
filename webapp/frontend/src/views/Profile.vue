@@ -10,6 +10,15 @@
             <p class="text-lg text-white/70">Benvenuto nel tuo profilo personale. Da qui puoi visualizzare e modificare le tue informazioni personali.</p>
             <p class="text-lg text-white/70"> {{ globalStore.userInfo.email }}.</p>
         </div>
+
+        <div class="mt-10 text-center">
+            <button 
+                @click="logout()" 
+                class="bg-red-500 text-white px-4 py-2 rounded hover:bg-red-700"
+            >
+                Logout
+            </button>
+        </div>
     
     </div>
     <!-- End About -->
@@ -28,6 +37,13 @@
 
         data(){
             return {};
+        },
+
+        methods: {
+            logout(){
+                this.globalStore.logout;
+                this.$router.push("/index");
+            }
         }
     }
 </script>

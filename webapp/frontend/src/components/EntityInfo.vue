@@ -364,12 +364,13 @@ export default {
 
       try {
         console.log("Bearer " + this.globalStore.token);
-          const response = await fetch("https://improved-bright-alien.ngrok-free.app/reviews/" + this.entityToShow.eid, {
+          const response = await fetch(this.globalStore.serverAddress + "/reviews/" + this.entityToShow.eid, {
               method: "POST",
               headers: {
-                  "ngrok-skip-browser-warning": "any",
-                  "Content-Type": "application/json",
-                  "authorization": "Bearer " + this.globalStore.token,
+                "X-Pinggy-No-Screen": "any",
+                "ngrok-skip-browser-warning": "any",
+                "Content-Type": "application/json",
+                "authorization": "Bearer " + this.globalStore.token,
               },
               body: JSON.stringify({
                 rating: rating,

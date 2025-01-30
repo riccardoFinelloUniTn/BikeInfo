@@ -243,10 +243,10 @@
       async getReviews(id: string) {
           // Get reviews from API
           try {
-              const response = await fetch("https://improved-bright-alien.ngrok-free.app/reviews/" + id, {
+              const response = await fetch(this.globalStore.serverAddress + "/reviews/" + id, {
                   method: "GET",
                   headers: {
-                      "ngrok-skip-browser-warning": "any"
+                    "ngrok-skip-browser-warning": "any"
                   },
               });
               const resp = await response.json();

@@ -89,7 +89,7 @@ export const fetchAndRefreshParcheggioProtetto = async (jsonData: string): Promi
               name: park,
               description: `Cicloposteggi: ${posti}`,
               geolocation: coordinates,
-              type: "centroInBici",
+              type: "parcheggioProtetto",
               rating: averageRating,
               reviews: totalReviews
             },

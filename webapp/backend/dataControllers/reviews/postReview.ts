@@ -67,8 +67,25 @@ export const postReview: RequestHandler = async (req: Request, res: Response, ne
       return;
     }
 
-    entity.rating = ((entity.rating * entity.reviews + rating) / (entity.reviews+1))
-    entity.reviews = entity.reviews+1;
+    let oldReviews = Number(entity.reviews);
+    let oldRating = Number(entity.rating);
+    let newRating = Number(rating);
+
+    if (isNaN(oldReviews) || isNaN(oldRating) || isNaN(newRating)) {
+      console.error("Invalid number detected", { oldReviews, oldRating, newRating });
+      res.status(500).json({ success: false, message: "Server error: Invalid rating values." });
+      return;
+    }
+
+    if (oldReviews === 0) {
+      entity.rating = newRating;
+    } else {
+      entity.rating = ((oldRating * oldReviews) + newRating) / (oldReviews + 1);
+    }
+
+    entity.reviews = oldReviews + 1;
+
+    console.log(`Updated rating: ${entity.rating} = (${oldRating} * ${oldReviews} + ${newRating}) / (${oldReviews + 1})`);
 
     await entity.save();
 
@@ -95,6 +112,7 @@ export const postReview: RequestHandler = async (req: Request, res: Response, ne
       success: true,
       message: "Review posted successfully.",
       feedback: newFeedback,
+      entity: entity
     });
   } catch (error) {
     console.error("Error posting review:", error);

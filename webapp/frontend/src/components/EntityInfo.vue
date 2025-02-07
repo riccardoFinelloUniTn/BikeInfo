@@ -290,13 +290,13 @@ export default {
     return { globalStore };
   },
 
-  props: ['entityToShow', 'reviewsToShow'],
+  props: ['entityToShow', 'reviewsToShow', 'entityType'],
 
   data() {
-
+    console.log("AAAAAA: " + this.entityToShow.rating);
     return { showInfoForm: true, showReviewForm: false, showFeedbackForm: false };
   },
-// TODO: CHANGE LOGIN ERROR INPUT BEHAVIOR!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+// TODO: CHANGE LOGIN ERROR INPUT BEHAVIOR (!) RED ICON !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
   methods: {
     showInfo(): void {
       console.log('showInfo');
@@ -350,15 +350,15 @@ export default {
       }
 
       let rating = 0;
-      if ((document.getElementById("hs-ratings-readonly-5") as HTMLInputElement)?.checked == true) {
+      if ((document.getElementById("hs-ratings-readonly-1") as HTMLInputElement)?.checked == true) {
         rating = 5;
-      } else if ((document.getElementById("hs-ratings-readonly-4") as HTMLInputElement)?.checked == true) {
+      } else if ((document.getElementById("hs-ratings-readonly-2") as HTMLInputElement)?.checked == true) {
         rating = 4;
       } else if ((document.getElementById("hs-ratings-readonly-3") as HTMLInputElement)?.checked == true) {
         rating = 3;
-      } else if ((document.getElementById("hs-ratings-readonly-2") as HTMLInputElement)?.checked == true) {
+      } else if ((document.getElementById("hs-ratings-readonly-4") as HTMLInputElement)?.checked == true) {
         rating = 2;
-      } else if ((document.getElementById("hs-ratings-readonly-1") as HTMLInputElement)?.checked == true) {
+      } else if ((document.getElementById("hs-ratings-readonly-5") as HTMLInputElement)?.checked == true) {
         rating = 1;
       }
 
@@ -367,7 +367,6 @@ export default {
           const response = await fetch(this.globalStore.serverAddress + "/reviews/" + this.entityToShow.eid, {
               method: "POST",
               headers: {
-                "X-Pinggy-No-Screen": "any",
                 "ngrok-skip-browser-warning": "any",
                 "Content-Type": "application/json",
                 "authorization": "Bearer " + this.globalStore.token,
@@ -378,6 +377,7 @@ export default {
               })
           });
           const resp = await response.json();
+          
           console.log(resp);
       } catch (error) {
           console.log(error);

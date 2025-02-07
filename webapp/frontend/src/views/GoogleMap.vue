@@ -53,8 +53,8 @@
       >
         <button
           class="p-2 rounded shadow-sm shadow-black/30 text-black bg-white hover:bg-gray-200" 
-          @click="loadRacks()"
-        >
+          @click="loadEntitiesByType(entityTypes[1])"
+        > <!-- RASTRELLIERE -->
           <img src="../assets/rack.png" alt="Rastrelliere" class="w-6 h-6">
         </button> 
       </CustomControl>
@@ -64,8 +64,8 @@
       >
         <button
           class="p-2 rounded shadow-sm shadow-black/30 text-black bg-white hover:bg-gray-200" 
-          @click="loadParkings()"
-        >
+          @click="loadEntitiesByType(entityTypes[0])"
+        > <!-- PARCHEGGI PROTETTI -->
           <img src="../assets/parking.png" alt="Rastrelliere" class="w-6 h-6">
         </button> 
       </CustomControl>
@@ -77,6 +77,7 @@
       v-if="globalStore.showEntityCard"
       :entity-to-show="entity"
       :reviews-to-show="reviews"
+      :entity-type="entitySelectedType"
     ></entity-info>
 
     
@@ -143,6 +144,8 @@
       const zoom = 18;
       const center = globalStore.$state.userLatLng;
       const userCircleRadius = this.calculateRadius(zoom);
+      const entityTypes = ["parcheggiProtetti", "rastrelliere"];
+      const entitySelectedType = "";
 
       const entity: {description: string, eid: string, geolocation: [], name: string, rating: number, type: string} = {description: "", eid: "", geolocation: [], name: "", rating: 0, type: ""};
       const reviews = [] as Array<{owner: string, comment: string}>;
@@ -233,7 +236,7 @@
       //   },
       // ];
     
-      return { API_KEY, locations, zoom, userCircleRadius, center, entity, reviews };
+      return { API_KEY, locations, zoom, userCircleRadius, center, entity, reviews, entityTypes, entitySelectedType };
       // return { center, API_KEY, locations, zoom, updatedRangeError, userCircleRadius, updatedUsrLatLang};
     },
 
@@ -286,28 +289,29 @@
         this.$router.push('/');
       },
 
-      async loadParkings() {
-        const response = await this.globalStore.getApiData("parcheggiProtetti");
+      async loadEntitiesByType(entityType: string) {
+        const response = await this.globalStore.getApiData(entityType);
         console.log(response);
         if (!response.success) {
           console.log("Server error");
           this.globalStore.$state.showMap = false;
           this.$router.push('/serverError');
         }
+        this.entitySelectedType = entityType;
         this.updateMarkers();
         this.globalStore.showEntityCard = false;
       },
 
-      async loadRacks() {
-        const response = await this.globalStore.getApiData("rastrelliere");
-        if (!response.success) {
-          console.log("Server error");
-          this.globalStore.$state.showMap = false;
-          this.$router.push('/serverError');
-        }
-        this.updateMarkers();
-        this.globalStore.showEntityCard = false;
-      },
+      // async loadRacks() {
+      //   const response = await this.globalStore.getApiData("rastrelliere");
+      //   if (!response.success) {
+      //     console.log("Server error");
+      //     this.globalStore.$state.showMap = false;
+      //     this.$router.push('/serverError');
+      //   }
+      //   this.updateMarkers();
+      //   this.globalStore.showEntityCard = false;
+      // },
 
       panMap(){
         if (this.globalStore.$state.userLatLng.lat == 0) {

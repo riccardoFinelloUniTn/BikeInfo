@@ -28,6 +28,13 @@
             </div>
 
             <div class="max-w-3xl text-center mx-auto">
+                <p class="text-lg text-white/70">La webapp ha la funzione di aiutare i ciclisti nel trovare le rastrelliere, le piste ciclabli 
+                    o i parcheggi protetti più vicini a loro, valutare lo stato del servizio offerto tramite recensioni di altri utenti
+                    e segnalare al comune eventuali problemi riscontrati.
+                </p>
+            </div>
+
+            <div class="max-w-3xl text-center mx-auto">
                 <p class="text-lg text-white/70">Si consiglia di utilizzare la mappa in modalità schermo intero per un'esperienza migliore</p>
             </div>
 

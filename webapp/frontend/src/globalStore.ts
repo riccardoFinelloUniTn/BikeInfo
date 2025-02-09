@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useGlobalStore = defineStore('global', {
     state: () => ({
 
-        serverAddress: "https://improved-bright-alien.ngrok-free.app",
+        serverAddress: "https://bikeinfo.onrender.com",
         showMap: true,
         rangeError: 0,
         userLatLng: {
@@ -40,9 +40,13 @@ export const useGlobalStore = defineStore('global', {
 
     
     actions: {
-        logout() {
+        logout(){
             localStorage.removeItem("token");
-            this.checkIfLoggedIn;
+            this.token = "";
+            this.isLoggedIn = false;
+            this.userInfo = null;
+            this.checkIfLoggedIn();
+            this.updatePages();
         },
 
         async updateUserPos(): Promise<GeolocationPosition> {
@@ -125,11 +129,15 @@ export const useGlobalStore = defineStore('global', {
 
         async isTokenValid(): Promise<any> {
             try {
+                let testToken = localStorage.getItem("token") || this.token;
+                if (!testToken) {
+                    return { loggedIn: false };
+                }
                 const response = await fetch(this.serverAddress + "/islogged", {
                     method: "GET",
                     headers: {
                         "ngrok-skip-browser-warning": "any",
-                        "authorization": "Bearer " + localStorage.getItem("token"),
+                        "authorization": "Bearer " + testToken,
                     },
                 });
                 const resp = await response.json();

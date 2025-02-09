@@ -227,7 +227,7 @@ import { onMounted } from 'vue';
                         if(data.success === true) {
                             console.log("Logging in...");
                             document.getElementById('registration-error')!.classList.add('hidden');
-                            const login = await this.globalStore.login(email.value, password.value, false);
+                            const login = await this.globalStore.login(email.value, password.value, true);
                             if (!login.success) {
                                 this.errorMsg = "Registered successfully, but could not log in. Please try manually.";
                                 alert(this.errorMsg);

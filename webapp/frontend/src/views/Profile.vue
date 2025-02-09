@@ -6,9 +6,9 @@
             Bentornato {{ globalStore.userInfo.name }}
         </h1>
 
-        <div class="max-w-3xl text-center mx-auto">
+        <div class="max-w-3xl text-left mx-auto">
             <p class="text-lg text-white/70">Benvenuto nel tuo profilo personale. Da qui puoi visualizzare e modificare le tue informazioni personali.</p>
-            <p class="text-lg text-white/70"> {{ globalStore.userInfo.email }}.</p>
+            <p class="text-lg text-white/70">Email:  {{ globalStore.userInfo.email }}.</p>
         </div>
 
         <div class="mt-10 text-center">
@@ -41,7 +41,7 @@
 
         methods: {
             logout(){
-                this.globalStore.logout;
+                this.globalStore.logout();
                 this.$router.push("/index");
             }
         }

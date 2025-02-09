@@ -2,7 +2,7 @@ openapi: 3.0.0
 info:
   title: Bike Info API
   description: API for managing bike-related data, user feedback, and reviews.
-  version: 1.0.0
+  version: 1.1.0
 paths:
   /auth:
     post:
@@ -20,7 +20,7 @@ paths:
                 password:
                   type: string
       responses:
-        '200':
+        "200":
           description: Authentication successful
           content:
             application/json:
@@ -33,11 +33,11 @@ paths:
                     type: string
                   token:
                     type: string
-        '400':
+        "400":
           description: Missing or invalid email/password
-        '401':
+        "401":
           description: Invalid credentials
-        '404':
+        "404":
           description: User not found
   /auth/google:
     post:
@@ -53,7 +53,7 @@ paths:
                 idToken:
                   type: string
       responses:
-        '200':
+        "200":
           description: Authentication via Google successful
           content:
             application/json:
@@ -72,27 +72,27 @@ paths:
                     type: string
                   token:
                     type: string
-        '400':
+        "400":
           description: Bad request or Google login failed
-        '500':
+        "500":
           description: Internal server error
   /register:
     post:
       summary: Register user
       operationId: registerUser
       responses:
-        '201':
+        "201":
           description: User registered successfully
-        '400':
+        "400":
           description: Bad request
   /register/google:
     post:
       summary: Google sign-in registration
-      operationId: signInWithGoogle
+      operationId: registerWithGoogle
       responses:
-        '201':
+        "201":
           description: User registered successfully with Google
-        '400':
+        "400":
           description: Bad request
   /feedbacks/{eid}:
     get:
@@ -105,15 +105,15 @@ paths:
             type: string
           description: Entity ID
       responses:
-        '200':
+        "200":
           description: List of feedbacks
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Feedback'
-        '404':
+                  $ref: "#/components/schemas/Feedback"
+        "404":
           description: Entity not found
     post:
       summary: Post feedback for an entity
@@ -129,15 +129,15 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Feedback'
+              $ref: "#/components/schemas/Feedback"
       responses:
-        '201':
+        "201":
           description: Feedback created successfully
-        '400':
+        "400":
           description: Missing or invalid data
-        '401':
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal server error
   /feedbacks/{fid}:
     patch:
@@ -159,15 +159,46 @@ paths:
                 comment:
                   type: string
       responses:
-        '200':
+        "200":
           description: Feedback updated successfully
-        '400':
+        "400":
           description: Missing or invalid data
-        '401':
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Feedback not found
-        '500':
+        "500":
+          description: Internal server error
+    delete:
+      summary: Delete feedback by ID
+      parameters:
+        - name: fid
+          in: path
+          required: true
+          schema:
+            type: string
+          description: Feedback ID
+      responses:
+        "200":
+          description: Feedback deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string
+        "400":
+          description: Missing feedback ID
+        "401":
+          description: Unauthorized
+        "403":
+          description: Unauthorized to delete this feedback
+        "404":
+          description: Feedback not found
+        "500":
           description: Internal server error
   /feedbacks/{fid}/answer:
     patch:
@@ -189,47 +220,15 @@ paths:
                 answer:
                   type: string
       responses:
-        '200':
+        "200":
           description: Answer updated successfully
-        '400':
+        "400":
           description: Missing or invalid data
-        '401':
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Feedback not found
-        '500':
-          description: Internal server error
-  /feedbacks/{fid}:
-    delete:
-      summary: Delete feedback by ID
-      parameters:
-        - name: fid
-          in: path
-          required: true
-          schema:
-            type: string
-          description: Feedback ID
-      responses:
-        '200':
-          description: Feedback deleted successfully
-          content:
-            application/json:
-              schema:
-                type: object
-                properties:
-                  success:
-                    type: boolean
-                  message:
-                    type: string
-        '400':
-          description: Missing feedback ID
-        '401':
-          description: Unauthorized
-        '403':
-          description: Unauthorized to delete this feedback
-        '404':
-          description: Feedback not found
-        '500':
+        "500":
           description: Internal server error
   /reviews/{eid}:
     get:
@@ -242,15 +241,15 @@ paths:
             type: string
           description: Entity ID
       responses:
-        '200':
+        "200":
           description: List of reviews
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Review'
-        '404':
+                  $ref: "#/components/schemas/Review"
+        "404":
           description: Entity not found
     post:
       summary: Post a review for an entity
@@ -266,17 +265,16 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Review'
+              $ref: "#/components/schemas/Review"
       responses:
-        '201':
+        "201":
           description: Review created successfully
-        '400':
+        "400":
           description: Missing or invalid data
-        '401':
+        "401":
           description: Unauthorized
-        '500':
+        "500":
           description: Internal server error
-  /reviews/{eid}:
     patch:
       summary: Update a review by entity ID
       parameters:
@@ -291,19 +289,18 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/Review'
+              $ref: "#/components/schemas/Review"
       responses:
-        '200':
+        "200":
           description: Review updated successfully
-        '400':
+        "400":
           description: Missing or invalid data
-        '401':
+        "401":
           description: Unauthorized
-        '404':
+        "404":
           description: Review not found
-        '500':
+        "500":
           description: Internal server error
-  /reviews/{eid}:
     delete:
       summary: Delete a review by entity ID
       parameters:
@@ -314,7 +311,7 @@ paths:
             type: string
           description: Entity ID
       responses:
-        '200':
+        "200":
           description: Review deleted successfully
           content:
             application/json:
@@ -325,75 +322,75 @@ paths:
                     type: boolean
                   message:
                     type: string
-        '400':
+        "400":
           description: Missing review ID
-        '401':
+        "401":
           description: Unauthorized
-        '403':
+        "403":
           description: Unauthorized to delete this review
-        '404':
+        "404":
           description: Review not found
-        '500':
+        "500":
           description: Internal server error
   /rastrelliere:
     get:
       summary: Get all rastrelliere data
       operationId: getRastrelliere
       responses:
-        '200':
+        "200":
           description: List of rastrelliere
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Entity'
-        '500':
+                  $ref: "#/components/schemas/Entity"
+        "500":
           description: Internal server error
   /pisteCiclabili:
     get:
       summary: Get all piste ciclabili data
       operationId: getPisteCiclabili
       responses:
-        '200':
+        "200":
           description: List of piste ciclabili
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Entity'
-        '500':
+                  $ref: "#/components/schemas/Entity"
+        "500":
           description: Internal server error
   /centroInBici:
     get:
       summary: Get all centro in bici data
       operationId: getCentroInBici
       responses:
-        '200':
+        "200":
           description: List of centro in bici
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Entity'
-        '500':
+                  $ref: "#/components/schemas/Entity"
+        "500":
           description: Internal server error
   /parcheggiProtetti:
     get:
       summary: Get all parcheggi protetti data
       operationId: getParcheggiProtetti
       responses:
-        '200':
+        "200":
           description: List of parcheggi protetti
           content:
             application/json:
               schema:
                 type: array
                 items:
-                  $ref: '#/components/schemas/Entity'
-        '500':
+                  $ref: "#/components/schemas/Entity"
+        "500":
           description: Internal server error
 components:
   schemas:

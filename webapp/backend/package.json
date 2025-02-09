@@ -5,8 +5,8 @@
   "main": "server.js",
   "scripts": {
     "build": "npx tsc",
-    "start": "node webapp/backend/dist/server.js",
-    "dev": "nodemon webapp/backend/server.ts"
+    "start": "node dist/server.js",
+    "dev": "nodemon server.ts"
   },
   "repository": {
     "type": "git",

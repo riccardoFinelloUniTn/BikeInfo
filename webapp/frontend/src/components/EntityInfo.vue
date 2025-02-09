@@ -386,7 +386,7 @@ export default {
     },
 
     sendFeedback(): void {
-      console.log('sendFeedback');
+      console.log('Feedback sent');
     }
   }
 };

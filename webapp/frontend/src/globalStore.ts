@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useGlobalStore = defineStore('global', {
     state: () => ({
 
-        serverAddress: import.meta.env.APIS_URL,
+        serverAddress: import.meta.env.VITE_APIS_URL,
         showMap: true,
         rangeError: 0,
         userLatLng: {

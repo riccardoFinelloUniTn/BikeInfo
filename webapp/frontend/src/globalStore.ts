@@ -3,7 +3,7 @@ import { defineStore } from 'pinia';
 export const useGlobalStore = defineStore('global', {
     state: () => ({
 
-        serverAddress: "https://bikeinfo.onrender.com",
+        serverAddress: import.meta.env.APIS_URL,
         showMap: true,
         rangeError: 0,
         userLatLng: {

@@ -162,6 +162,7 @@ export const useGlobalStore = defineStore('global', {
                 console.log(this.apiData);
                 return resp;
             } catch (error) {
+                console.log(error);
                 return false;
             }
         },

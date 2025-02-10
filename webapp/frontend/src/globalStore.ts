@@ -7,8 +7,8 @@ export const useGlobalStore = defineStore('global', {
         showMap: true,
         rangeError: 0,
         userLatLng: {
-            lat: 0,
-            lng: 0,
+            lat: 46.067536,
+            lng: 11.121469,
         },
         showEntityCard: false,
 

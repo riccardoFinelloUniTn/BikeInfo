@@ -293,7 +293,7 @@ export default {
   props: ['entityToShow', 'reviewsToShow', 'entityType'],
 
   data() {
-    console.log("AAAAAA: " + this.entityToShow.rating);
+    // console.log("AAAAAA: " + this.entityToShow.rating);
     return { showInfoForm: true, showReviewForm: false, showFeedbackForm: false };
   },
 // TODO: CHANGE LOGIN ERROR INPUT BEHAVIOR (!) RED ICON !!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -363,7 +363,7 @@ export default {
       }
 
       try {
-        console.log("Bearer " + this.globalStore.token);
+        // console.log("Bearer " + this.globalStore.token);
           const response = await fetch(this.globalStore.serverAddress + "/reviews/" + this.entityToShow.eid, {
               method: "POST",
               headers: {
@@ -377,10 +377,12 @@ export default {
               })
           });
           const resp = await response.json();
-          
+          this.globalStore.showEntityCard = false;
+          this.entityToShow.rating = resp.entity.rating;
           console.log(resp);
       } catch (error) {
           console.log(error);
+          this.globalStore.showEntityCard = false;
       }
 
     },
